@@ -2,21 +2,23 @@
   "name": "trinos-api",
   "version": "1.0.0",
   "description": "Twitter-like API",
-  "main": "app.js",
+  "private": true,
   "scripts": {
-    "start": "node app.js",
-    "dev": "nodemon app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node ./bin/www",
+    "dev": "nodemon ./bin/www",
+    "test": "jest"
   },
   "author": "sjdonado",
   "license": "GPL-3.0",
   "devDependencies": {
     "eslint": "^7.32.0",
     "eslint-config-airbnb-base": "^14.2.1",
-    "eslint-plugin-import": "^2.24.1"
+    "eslint-plugin-import": "^2.24.1",
+    "jest": "^27.0.6",
+    "nodemon": "^2.0.12",
+    "supertest": "^6.1.6"
   },
   "dependencies": {
-    "express": "^4.17.1",
-    "nodemon": "^2.0.12"
+    "express": "^4.17.1"
   }
 }
