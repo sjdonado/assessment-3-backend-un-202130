@@ -1,3 +1,5 @@
+const ApiError = require('../utils/ApiError');
+
 const USERS = [];
 
 /**
@@ -12,9 +14,9 @@ const USERS = [];
  * @returns {Object}
  */
 const create = (user) => new Promise((resolve, reject) => {
-  const userKeys = Object.keys(user);
-  if (!userKeys.includes('username') || !userKeys.includes('email')) {
-    reject(new Error('Invalid object'));
+  if (Object.values(user).some((val) => val === undefined)) {
+    reject(new ApiError('Payload must contain name, username and email', 400));
+    return;
   }
 
   const newUser = {
@@ -38,7 +40,8 @@ const getbyId = (id) => new Promise((resolve, reject) => {
   const user = USERS.find((elem) => elem.id === Number(id));
 
   if (!user) {
-    reject(new Error('User not found'));
+    reject(new ApiError('User not found', 400));
+    return;
   }
 
   resolve(user);
