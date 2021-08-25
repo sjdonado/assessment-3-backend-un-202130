@@ -7,6 +7,13 @@
 const http = require('http');
 const app = require('../app');
 
+const database = require('../src/database');
+
+/**
+ * Connect to database
+ */
+database.init();
+
 /**
  * Normalize a port into a number, string, or false.
  */

@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node ./bin/www",
     "dev": "nodemon ./bin/www",
-    "test": "jest"
+    "test": "jest",
+    "db:migrate": "cd ./src/database && sequelize db:migrate",
+    "db:model:generate": "cd ./src/database && sequelize model:generate"
   },
   "author": "sjdonado",
   "license": "GPL-3.0",
@@ -16,9 +18,15 @@
     "eslint-plugin-import": "^2.24.1",
     "jest": "^27.0.6",
     "nodemon": "^2.0.12",
+    "sequelize-cli": "^6.2.0",
     "supertest": "^6.1.6"
   },
   "dependencies": {
-    "express": "^4.17.1"
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "pg": "^8.7.1",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.6.5",
+    "sqlite3": "^5.0.2"
   }
 }
