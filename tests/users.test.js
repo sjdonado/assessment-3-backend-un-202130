@@ -1,6 +1,7 @@
 const request = require('supertest');
 
 const app = require('../app');
+const database = require('../src/database');
 
 const USERS_PATH = '/users';
 
@@ -11,6 +12,10 @@ const FAKE_USER = {
 };
 
 describe('Users routes', () => {
+  beforeAll(async () => {
+    await database.init();
+  });
+
   it('Should create user', async () => {
     const payload = {
       password: '12345',
@@ -38,7 +43,7 @@ describe('Users routes', () => {
     const response = await request(app).post(USERS_PATH).send(payload);
 
     expect(response.statusCode).toBe(400);
-    expect(response.body.status).toBe('Payload must contain name, username and email');
+    expect(response.body.status).toBe('Payload must contain name, username, email and password');
   });
 
   it('Should return bad request with missmatch passwords', async () => {
