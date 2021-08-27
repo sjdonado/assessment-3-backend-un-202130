@@ -24,7 +24,7 @@ const createUser = async (req, res, next) => {
 
     const user = await User.create(userPayload);
 
-    res.json(new UserSerializer(user).toJSON());
+    res.json(new UserSerializer(user));
   } catch (err) {
     next(err);
   }
@@ -40,7 +40,7 @@ const getUserById = async (req, res, next) => {
       throw new ApiError('User not found', 400);
     }
 
-    res.json(new UserSerializer(user).toJSON());
+    res.json(new UserSerializer(user));
   } catch (err) {
     next(err);
   }

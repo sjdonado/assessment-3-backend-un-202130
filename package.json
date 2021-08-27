@@ -7,6 +7,7 @@
     "start": "node ./bin/www",
     "dev": "nodemon ./bin/www",
     "test": "jest",
+    "linter": "eslint bin/www src/**/*.js app.js",
     "db:migrate": "cd ./src/database && sequelize db:migrate",
     "db:migration:generate": "cd ./src/database && sequelize migration:generate",
     "db:model:generate": "cd ./src/database && sequelize model:generate"

@@ -1,0 +1,17 @@
+name: Assessment auto-review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+        run: npm install
+      - name: Run linter
+        run: npm run linter
+      - name: Run tests
+        run: npm run test
