@@ -8,6 +8,7 @@
     "dev": "nodemon ./bin/www",
     "test": "jest",
     "db:migrate": "cd ./src/database && sequelize db:migrate",
+    "db:migration:generate": "cd ./src/database && sequelize migration:generate",
     "db:model:generate": "cd ./src/database && sequelize model:generate"
   },
   "author": "sjdonado",

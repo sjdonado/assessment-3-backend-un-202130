@@ -10,7 +10,6 @@ services:
       - /usr/src/app/node_modules
       - .:/usr/src/app
     environment:
-      TEST_DATABASE_URL: 'sqlite::memory:'
       DATABASE_URL: postgres://trinos_user:root_12345@db:5432/trinos
     ports:
       - 3000:3000
