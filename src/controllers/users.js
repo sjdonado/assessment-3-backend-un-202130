@@ -18,7 +18,7 @@ const createUser = async (req, res, next) => {
       password: body.password,
     });
 
-    res.json(new UserSerializer(user).toJSON());
+    res.json(new UserSerializer(user));
   } catch (err) {
     next(err);
   }
@@ -30,7 +30,7 @@ const getUserById = async (req, res, next) => {
 
     const user = await User.getbyId(params.id);
 
-    res.json(new UserSerializer(user).toJSON());
+    res.json(new UserSerializer(user));
   } catch (err) {
     next(err);
   }

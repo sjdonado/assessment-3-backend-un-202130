@@ -15,7 +15,7 @@ const USERS = [];
  */
 const create = (user) => new Promise((resolve, reject) => {
   if (Object.values(user).some((val) => val === undefined)) {
-    reject(new ApiError('Payload must contain name, username and email', 400));
+    reject(new ApiError('Payload must contain name, username, email and password', 400));
     return;
   }
 
@@ -26,6 +26,7 @@ const create = (user) => new Promise((resolve, reject) => {
     lastLoginDate: null,
     ...user,
   };
+
   USERS.push(newUser);
 
   resolve(newUser);
