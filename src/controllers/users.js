@@ -28,7 +28,7 @@ const getUserById = async (req, res, next) => {
   try {
     const { params } = req;
 
-    const user = await User.getbyId(params.id);
+    const user = await User.findOne({ where: { id: params.id } });
 
     res.json(new UserSerializer(user));
   } catch (err) {

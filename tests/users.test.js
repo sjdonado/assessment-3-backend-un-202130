@@ -39,7 +39,7 @@ describe('Users routes', () => {
     expect(response.body.data.username).toBe(payload.username);
     expect(response.body.data.email).toBe(payload.email);
     expect(response.body.data.createdAt).not.toBeNull();
-    expect(response.body.data.updatedAt).toBeNull();
+    expect(response.body.data.updatedAt).not.toBeNull();
     expect(response.body.data.lastLoginDate).toBeNull();
 
     expect(response.body.data.password).toBeUndefined();
@@ -81,7 +81,7 @@ describe('Users routes', () => {
     expect(response.body.data.username).toBe(FIRST_USER.username);
     expect(response.body.data.email).toBe(FIRST_USER.email);
     expect(response.body.data.createdAt).not.toBeNull();
-    expect(response.body.data.updatedAt).toBeNull();
+    expect(response.body.data.updatedAt).not.toBeNull();
     expect(response.body.data.lastLoginDate).toBeNull();
 
     expect(response.body.data.password).toBeUndefined();
@@ -90,6 +90,14 @@ describe('Users routes', () => {
 
   it('Should return bad request when user does not exist', async () => {
     const USER_ID = 0;
+    const response = await request(app).get(`${USERS_PATH}/${USER_ID}`);
+
+    expect(response.statusCode).toBe(400);
+    expect(response.body.status).toBe('User not found');
+  });
+
+  it('Should return bad request on get a deactivated user', async () => {
+    const USER_ID = 2;
     const response = await request(app).get(`${USERS_PATH}/${USER_ID}`);
 
     expect(response.statusCode).toBe(400);
@@ -112,7 +120,7 @@ describe('Users routes', () => {
     expect(response.body.data.username).toBe(payload.username);
     expect(response.body.data.email).toBe(payload.email);
     expect(response.body.data.createdAt).not.toBeNull();
-    expect(response.body.data.updatedAt).toBeNull();
+    expect(response.body.data.updatedAt).not.toBeNull();
     expect(response.body.data.lastLoginDate).toBeNull();
 
     expect(response.body.data.password).toBeUndefined();
@@ -121,7 +129,12 @@ describe('Users routes', () => {
 
   it('Should return bad request on update deactivated user', async () => {
     const USER_ID = 2;
-    const response = await request(app).get(`${USERS_PATH}/${USER_ID}`);
+    const payload = {
+      username: 'new_username',
+      email: 'new_email@test.com',
+      name: 'New name',
+    };
+    const response = await request(app).put(`${USERS_PATH}/${USER_ID}`).send(payload);
 
     expect(response.statusCode).toBe(400);
     expect(response.body.status).toBe('User not found');
