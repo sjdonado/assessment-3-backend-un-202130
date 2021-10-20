@@ -1,5 +1,4 @@
 const ApiError = require('../utils/ApiError');
-
 const User = require('../models/user');
 const UserSerializer = require('../serializers/UserSerializer');
 
@@ -65,7 +64,7 @@ const createUser = async (req, res, next) => {
       email: body.email,
       name: body.name,
       password: body.password,
-      active: undefined,
+      active: true,
     });
 
     res.json(new UserSerializer(user));
@@ -119,6 +118,7 @@ const deactivateUser = async (req, res, next) => {
     const { params } = req;
 
     const user = await User.findOne({ where: { id: params.id } });
+
     isUserActive(user);
 
     await User.update({ where: { id: params.id } }, { active: false });
