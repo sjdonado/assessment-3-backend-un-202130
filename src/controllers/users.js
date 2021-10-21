@@ -17,10 +17,12 @@ const createUser = async (req, res, next) => {
       password: body.password,
       // active: undefined,
     });
+
     if (user.username === undefined || user.email === undefined
       || user.name === undefined || user.password === undefined) {
       throw new ApiError('Payload must contain name, username, email and password', 400);
     }
+
     res.json(new UserSerializer(user));
   } catch (err) {
     next(err);
@@ -48,21 +50,41 @@ const updateUser = async (req, res, next) => {
       email: 'new_email@test.com',
       name: 'New name',
     };
-    console.log(params);
     const user = await User.update({ where: { id: params.id } }, payload);
-    console.log('usuarios:');
     console.log(user);
     if (user.active === false) {
       throw new ApiError('User not found', 400);
     }
+
     res.json(new UserSerializer(user));
   } catch (err) {
     next(err);
   }
 };
 
+const deactivateUser = async (req, res, next) => {
+  try {
+    const { params } = req;
+
+    const user = await User.findOne({ where: { id: params.id } });
+    if (user === undefined || user.active === false) {
+      throw new ApiError('User not found', 400);
+    }
+    const payload = {
+      data: null,
+      active: false,
+    };
+    const user2 = await User.update({ where: { id: params.id } }, payload);
+
+    console.log(user2.data);
+    res.json(new UserSerializer(user2));
+  } catch (err) {
+    next(err);
+  }
+};
 module.exports = {
   createUser,
   getUserById,
   updateUser,
+  deactivateUser,
 };

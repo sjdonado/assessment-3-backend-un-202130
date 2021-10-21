@@ -4,8 +4,9 @@ class UserSerializer extends BaseSerializer {
   constructor(model) {
     const serializedModel = model != null ? { ...model } : null;
 
-    delete serializedModel?.password;
+    delete serializedModel.password;
     serializedModel.active = undefined;
+    console.log(serializedModel);
     super('success', serializedModel);
   }
 }
