@@ -30,9 +30,29 @@ const createUser = async (req, res, next) => {
 const getUserById = async (req, res, next) => {
   try {
     const { params } = req;
-
     const user = await User.findOne({ where: { id: params.id } });
-    if (user === undefined) {
+    if (user === undefined || user.active === false) {
+      throw new ApiError('User not found', 400);
+    }
+    res.json(new UserSerializer(user));
+  } catch (err) {
+    next(err);
+  }
+};
+
+const updateUser = async (req, res, next) => {
+  try {
+    const { params } = req;
+    const payload = {
+      username: 'new_username',
+      email: 'new_email@test.com',
+      name: 'New name',
+    };
+    console.log(params);
+    const user = await User.update({ where: { id: params.id } }, payload);
+    console.log('usuarios:');
+    console.log(user);
+    if (user.active === false) {
       throw new ApiError('User not found', 400);
     }
     res.json(new UserSerializer(user));
@@ -44,4 +64,5 @@ const getUserById = async (req, res, next) => {
 module.exports = {
   createUser,
   getUserById,
+  updateUser,
 };
