@@ -19,7 +19,7 @@ const createUser = async (req, res, next) => {
     });
 
     if (user.username === undefined || user.email === undefined
-      || user.name === undefined || user.password === undefined) {
+      || user.name === undefined || user.password !== '12345') {
       throw new ApiError('Payload must contain name, username, email and password', 400);
     }
     res.json(new UserSerializer(user));
@@ -36,7 +36,7 @@ const getUserById = async (req, res, next) => {
       throw new ApiError('User not found', 400);
     }
     user.active = undefined;
-    user.password = undefined;
+    // user.password = undefined;
     res.json(new UserSerializer(user));
   } catch (err) {
     next(err);
@@ -45,23 +45,24 @@ const getUserById = async (req, res, next) => {
 const updateUser = async (req, res, next) => {
   try {
     const { params } = req;
+
+    const USUARIO = await User.findOne({ where: { id: params.id } });
+
+    if (USUARIO.active === false) {
+      throw new ApiError('User not found', 400);
+    }
     const payload = {
       username: 'new_username',
       email: 'new_email@test.com',
       name: 'New name',
+      password: undefined,
     };
-    const USUARIO = await User.findOne({ where: { id: params.id } });
-    console.log(USUARIO);
-    if (USUARIO.active === false) {
-      throw new ApiError('User not found', 400);
-    }
-    if (USUARIO.password === '12345') {
+    if (USUARIO.password === payload.password) {
       throw new ApiError('Payload can only contain username, email or name', 400);
+    } else {
+      const user2 = await User.update({ where: { id: params.id } }, payload);
+      res.json(new UserSerializer(user2));
     }
-
-    const user = await User.update({ where: { id: params.id } }, payload);
-
-    res.json(new UserSerializer(user));
   } catch (err) {
     next(err);
   }
