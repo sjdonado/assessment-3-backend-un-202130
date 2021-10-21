@@ -15,14 +15,12 @@ const createUser = async (req, res, next) => {
       email: body.email,
       name: body.name,
       password: body.password,
-      active: undefined,
+      // active: undefined,
     });
-
     if (user.username === undefined || user.email === undefined
       || user.name === undefined || user.password === undefined) {
       throw new ApiError('Payload must contain name, username, email and password', 400);
     }
-
     res.json(new UserSerializer(user));
   } catch (err) {
     next(err);
@@ -33,9 +31,10 @@ const getUserById = async (req, res, next) => {
   try {
     const { params } = req;
 
-    console.log(params);
     const user = await User.findOne({ where: { id: params.id } });
-
+    if (user === undefined) {
+      throw new ApiError('User not found', 400);
+    }
     res.json(new UserSerializer(user));
   } catch (err) {
     next(err);
