@@ -22,6 +22,7 @@ const createUser = async (req, res, next) => {
       || user.name === undefined || user.password !== '12345') {
       throw new ApiError('Payload must contain name, username, email and password', 400);
     }
+    // user.active = undefined;
     res.json(new UserSerializer(user));
   } catch (err) {
     next(err);
@@ -75,13 +76,15 @@ const deactivateUser = async (req, res, next) => {
     if (user === undefined || user.active === false) {
       throw new ApiError('User not found', 400);
     }
+
     const payload = {
       data: null,
-      active: false,
+      active: true,
     };
+
     const user2 = await User.update({ where: { id: params.id } }, payload);
 
-    res.json(new UserSerializer(user2));
+    res.json(new UserSerializer(null));
   } catch (err) {
     next(err);
   }
