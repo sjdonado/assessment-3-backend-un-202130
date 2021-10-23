@@ -11,7 +11,6 @@ const createUser = async (req, res, next) => {
       throw new ApiError('Passwords do not match', 400);
     }
 
-
     const data = {
       username: body.username,
       email: body.email,
@@ -24,9 +23,6 @@ const createUser = async (req, res, next) => {
     }
 
     const user = await User.create(data);
-
-
-
     res.json(new UserSerializer(user));
   } catch (err) {
     next(err);
@@ -39,10 +35,15 @@ const updateUser = async (req, res, next) => {
     const { params } = req;
 
     const userFound = await User.findOne({ where: { id: params.id } });
-    if(!userFound.active){
+    if(!userFound || !userFound.active){
       throw new ApiError('User not found', 400);
     }
 
+    if (Object.keys(body).map((e) =>{
+      if(e !== 'name' && e !== 'username' && e !== 'email'){
+        throw new ApiError('Payload can only contain username, email or name', 400);
+      };
+    }));
 
     const data = {};
     if (body.name) {
@@ -54,6 +55,7 @@ const updateUser = async (req, res, next) => {
     if (body.email) {
       data['email'] = body.email;
     }
+
     const user = await User.update({ where: { id: params.id } }, data )
     res.json(new UserSerializer(user));
   } catch (err) {
@@ -65,13 +67,12 @@ const deleteUser = async (req, res, next) => {
   try {
     const { params } = req;
     const userFound = await User.findOne({ where: { id: params.id } });
-    if(!userFound.active){
+    if(!userFound || !userFound.active){
       throw new ApiError('User not found', 400);
     }
 
-
     const user = await User.update({ where: { id: params.id } }, {active: false} )
-    res.json(new UserSerializer(user));
+    res.status(200).json({status: 'success', data: null});
   } catch (err) {
     next(err);
   }
