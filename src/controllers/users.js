@@ -78,7 +78,7 @@ const deleteUser = async (req, res, next) => {
   }
 };
 
-
+//prueba
 const getUserById = async (req, res, next) => {
   try {
     const { params } = req;
