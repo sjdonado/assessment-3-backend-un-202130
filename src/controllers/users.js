@@ -36,7 +36,36 @@ const getUserById = async (req, res, next) => {
   }
 };
 
+const updateUser = async (req, res, next) => {
+  try {
+    const { params } = req;
+    const { body } = req;
+
+    const user = await User.findOne({ where: { id: params.id } });
+
+    const userData = {
+      username: body.username,
+      email: body.email,
+      name: body.name,
+    };
+
+    if (Object.values(userData).some((val) => val === undefined)) {
+      throw new ApiError('Payload can only contain username, email or name', 400);
+    }
+
+    const userUpdate = await User.update(
+      { where: { id: params.id } },
+      userData,
+    );
+
+    res.json(new UserSerializer(userUpdate));
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   createUser,
   getUserById,
+  updateUser,
 };
