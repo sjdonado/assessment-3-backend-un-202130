@@ -6,9 +6,26 @@ const UserSerializer = require('../serializers/UserSerializer');
 const createUser = async (req, res, next) => {
   try {
     const { body } = req;
+    let myError = '';
+    let myErrorCode = '';
 
     if (body.password !== body.passwordConfirmation) {
-      throw new ApiError('Passwords do not match', 400);
+      myError = 'Passwords do not match';
+      myErrorCode = 400;
+    }
+
+    if (!body.name || !body.username || !body.email || !body.password) {
+      myError = 'Payload must contain name, username, email and password';
+      myErrorCode = 400;
+    }
+
+    if (body.active === false) {
+      myError = 'User not found';
+      myErrorCode = 400;
+    }
+
+    if (myError !== '') {
+      throw new ApiError(myError, myErrorCode);
     }
 
     const user = await User.create({
@@ -18,6 +35,7 @@ const createUser = async (req, res, next) => {
       password: body.password,
     });
 
+    user.active = undefined;
     res.json(new UserSerializer(user));
   } catch (err) {
     next(err);
