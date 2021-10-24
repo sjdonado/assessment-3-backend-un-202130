@@ -1,7 +1,6 @@
 const ApiError = require('../utils/ApiError');
 const BaseSerializer = require('../serializers/BaseSerializer');
 
-
 const User = require('../models/user');
 const UserSerializer = require('../serializers/UserSerializer');
 
@@ -31,7 +30,6 @@ const createUser = async (req, res, next) => {
     next(err);
   }
 };
-
 
 const getUserById = async (req, res, next) => {
   try {
