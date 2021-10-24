@@ -8,7 +8,7 @@ const createUser = async(req, res, next) => {
     try {
         const { body } = req;
 
-        if (Object.values(body).some((val) => val === undefined)) {
+        if(!body.name || !body.username || !body.email || !body.password){
             throw new ApiError('Payload must contain name, username, email and password', 400);
         }
         
