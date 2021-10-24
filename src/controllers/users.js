@@ -13,12 +13,10 @@ const createUser = async (req, res, next) => {
       myError = 'Passwords do not match';
       myErrorCode = 400;
     }
-
     if (!body.name || !body.username || !body.email || !body.password) {
       myError = 'Payload must contain name, username, email and password';
       myErrorCode = 400;
     }
-
     if (body.active === false) {
       myError = 'User not found';
       myErrorCode = 400;
@@ -70,8 +68,30 @@ const updateUser = async (req, res, next) => {
       throw new ApiError(myError, myErrorCode);
     }
 
-    const userUpdated = await user.update({ where: { id: params.id } }, body);
+    const userUpdated = await User.update({ where: { id: params.id } }, body);
     res.json(new UserSerializer(userUpdated));
+  } catch (err) {
+    next(err);
+  }
+};
+
+const deactivateUser = async (req, res, next) => {
+  let myError = '';
+  let myErrorCode = '';
+
+  try {
+    const { params } = req;
+    const user = await User.findOne({ where: { id: params.id } });
+
+    if (!user || user.active === false) {
+      myError = 'User not found';
+      myErrorCode = 400;
+      throw new ApiError(myError, myErrorCode);
+    }
+
+    user.active = true;
+    User.update({ where: { id: params.id } }, user);
+    res.json({ status: 'success', data: null });
   } catch (err) {
     next(err);
   }
@@ -106,4 +126,5 @@ module.exports = {
   createUser,
   getUserById,
   updateUser,
+  deactivateUser,
 };
