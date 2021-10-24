@@ -1,13 +1,13 @@
 const BaseSerializer = require('./BaseSerializer');
 
 class UserSerializer extends BaseSerializer {
-    constructor(model) {
-        const serializedModel = model != null ? {...model } : null;
+  constructor(model) {
+    const serializedModel = model != null ? { ...model } : null;
 
-        delete serializedModel?.active;
-        delete serializedModel?.password;
+    delete serializedModel?.active;
+    delete serializedModel?.password;
 
-        super('success', serializedModel);
-    }
+    super('success', serializedModel);
+  }
 }
 module.exports = UserSerializer;
