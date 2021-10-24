@@ -28,12 +28,20 @@ const createUser = async (req, res, next) => {
 
 const getUserById = async (req, res, next) => {
   try {
-    const { params } = req;
+    const { params, body } = req;
     const user = await User.findOne({ where: { id: params.id } });
     if (user === undefined || user.active === false) {
       throw new ApiError('User not found', 400);
     }
-    res.json(new UserSerializer(user));
+    if (Object.keys(body).length === 0) {
+      res.json(new UserSerializer(user));
+    } else {
+      if ((body.username == null && body.email == null && body.name == null) || body.password != null) {
+        throw new ApiError('Payload can only contain username, email or name', 400);
+      }
+      const userUpdate = await User.update({ where: { id: params.id } }, { username: body.username, email: body.email, name: body.name });
+      res.json(new UserSerializer(userUpdate));
+    }
   } catch (err) {
     next(err);
   }
