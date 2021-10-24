@@ -36,7 +36,33 @@ const getUserById = async (req, res, next) => {
   }
 };
 
+const updateUser = async (req, res, next) => {
+  try {
+    const { params } = req;
+
+    const user = await User.findOne({ where: { id: params.id } });
+
+    res.json(new UserSerializer(user));
+  } catch (err) {
+    next(err);
+  }
+};
+
+const deactivateUser = async (req, res, next) => {
+  try {
+    const { params } = req;
+
+    const user = await User.findOne({ where: { id: params.id } });
+
+    res.json(new UserSerializer(user));
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   createUser,
   getUserById,
+  deactivateUser,
+  updateUser,
 };
