@@ -45,10 +45,19 @@ const createUser = async (req, res, next) => {
 };
 
 const getUserById = async (req, res, next) => {
+  finalError.message = 'User not found';
+  finalError.code = 400;
+
   try {
     const { params } = req;
 
     const user = await User.findOne({ where: { id: params.id } });
+
+    if (user === undefined || user.active === false) {
+      ThrowError(finalError.message, finalError.code);
+    }
+
+    user.active = undefined;
 
     res.json(new UserSerializer(user));
   } catch (err) {
