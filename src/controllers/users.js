@@ -38,8 +38,10 @@ const createUser = async (req, res, next) => {
 const getUserById = async (req, res, next) => {
   try {
     const { params } = req;
-
+    // console.log(params);
     const user = await User.findOne({ where: { id: params.id } });
+    // console.log(user);
+    if (user === undefined || user.active === false) throw new ApiError('User not found', 400);
 
     res.json(new UserSerializer(user));
   } catch (err) {
