@@ -36,7 +36,29 @@ const getUserById = async (req, res, next) => {
   }
 };
 
+const deleteUser = async (req, res, next) => {
+  try {
+    const { params } = req;
+
+    const user = await User.findOne({ where: { id: params.id } });
+
+    if (user === undefined || user.active === false) {
+      throw new ApiError('User not found', 400);
+    }
+
+    await User.update({ where: { id: params.id } },
+      {
+        active: false,
+      });
+
+    res.json(new UserSerializer(null));
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   createUser,
   getUserById,
+  deleteUser,
 };
