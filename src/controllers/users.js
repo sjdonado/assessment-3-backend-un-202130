@@ -20,16 +20,13 @@ const createUser = async (req, res, next) => {
     if (!nameU || !UserName || !Contraseña || !Email) {
       throw new ApiError(ErrorMenssage, ErrorCode);
     }
-
-    const user = await User.create({
+    res.json(new UserSerializer(await User.create({
       username: UserName,
       email: Email,
       name: nameU,
       password: Contraseña,
       active: true,
-    });
-
-    res.json(new UserSerializer(user));
+    })));
   } catch (err) {
     next(err);
   }
@@ -101,13 +98,12 @@ const updateUser = async (req, res, next) => {
     if (!Nombre && !Usuario && !Correo) {
       throw new ApiError(ErrorMenssage2, ErrorCode2);
     }
-    const UserD = {
+
+    res.json(new UserSerializer(await User.update({ where: { id: params.id } }, {
       name: Nombre,
       username: Usuario,
       email: Correo,
-    };
-
-    res.json(new UserSerializer(await User.update({ where: { id: params.id } }, UserD)));
+    })));
   } catch (err) {
     next(err);
   }
