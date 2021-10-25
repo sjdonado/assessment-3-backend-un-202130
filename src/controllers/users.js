@@ -3,11 +3,39 @@ const ApiError = require('../utils/ApiError');
 const User = require('../models/user');
 const UserSerializer = require('../serializers/UserSerializer');
 
+async function validateKeys(bodyKeys) {
+  let counter = 0;
+
+  if (await bodyKeys.find((key) => key === 'username')) {
+    counter += 1;
+  }
+
+  if (await bodyKeys.find((key) => key === 'email')) {
+    counter += 1;
+  }
+
+  if (await bodyKeys.find((key) => key === 'name')) {
+    counter += 1;
+  }
+
+  if (counter === bodyKeys.length && (bodyKeys.length < 4 && bodyKeys.length > 0)) {
+    return true;
+  }
+
+  return false;
+}
+
 const createUser = async (req, res, next) => {
   try {
     const { body } = req;
 
-    if (body.name === undefined || body.username === undefined || body.email === undefined || body.password === undefined || body.passwordConfirmation === undefined || Object.keys(body).lenght > 5) {
+    if (body.name === undefined || body.username === undefined || body.email === undefined) {
+      if (body.passwordConfirmation === undefined || Object.keys(body).lenght > 5) {
+        if (body.password === undefined) {
+          throw new ApiError('Payload must contain name, username, email and password', 400);
+        }
+        throw new ApiError('Payload must contain name, username, email and password', 400);
+      }
       throw new ApiError('Payload must contain name, username, email and password', 400);
     }
 
@@ -69,11 +97,10 @@ const updateUser = async (req, res, next) => {
     } else {
       throw new ApiError('Payload can only contain username, email or name', 400);
     }
-
   } catch (err) {
     next(err);
   }
-}
+};
 
 const deactivateUser = async (req, res, next) => {
   try {
@@ -95,33 +122,11 @@ const deactivateUser = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-}
-
-async function validateKeys(bodyKeys) {
-  let counter = 0;
-
-  if (await bodyKeys.find(key => key === 'username')) {
-    counter = counter + 1;
-  }
-
-  if (await bodyKeys.find(key => key === 'email')) {
-    counter = counter + 1;
-  }
-
-  if (await bodyKeys.find(key => key === 'name')) {
-    counter = counter + 1;
-  }
-
-  if (counter === bodyKeys.length && (bodyKeys.length < 4 && bodyKeys.length > 0)) {
-    return true;
-  }
-
-  return false;
-}
+};
 
 module.exports = {
   createUser,
   getUserById,
   updateUser,
-  deactivateUser
+  deactivateUser,
 };
