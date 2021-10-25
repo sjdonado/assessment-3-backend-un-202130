@@ -11,7 +11,9 @@ const createUser = async (req, res, next) => {
       username, email, name, password, passwordConfirmation,
     } = body;
 
-    if (password !== passwordConfirmation) throw new ApiError('Passwords do not match', 400);
+    if (password !== passwordConfirmation) {
+      throw new ApiError('Passwords do not match', 400);
+    }
 
     if (
       (name === undefined || name.length === 0)
