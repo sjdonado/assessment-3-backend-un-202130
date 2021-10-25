@@ -54,7 +54,6 @@ const find = ({ where }, kind) => new Promise((resolve, reject) => {
  * @returns {Object}
  */
 const findOne = (where) => find(where, 'find');
-
 /**
  *
  * @param {{ where: Object }} Object Search filters
