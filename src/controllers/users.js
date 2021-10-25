@@ -11,6 +11,18 @@ const createUser = async (req, res, next) => {
       throw new ApiError('Passwords do not match', 400);
     }
 
+    if (body.name === undefined) {
+      throw new ApiError('Payload must contain name, username, email and password', 400);
+    }
+
+    if (body.username === undefined) {
+      throw new ApiError('Payload must contain name, username, email and password', 400);
+    }
+
+    if (body.email === undefined) {
+      throw new ApiError('Payload must contain name, username, email and password', 400);
+    }
+
     const user = await User.create({
       username: body.username,
       email: body.email,
@@ -30,13 +42,76 @@ const getUserById = async (req, res, next) => {
 
     const user = await User.findOne({ where: { id: params.id } });
 
+    if (user === undefined) {
+      throw new ApiError('User not found', 400);
+    }
+
+    if (user.active === false) {
+      throw new ApiError('User not found', 400);
+    }
+
     res.json(new UserSerializer(user));
   } catch (err) {
     next(err);
   }
 };
 
+const updateUser = async (req, res, next) => {
+  try {
+    const { params, body } = req;
+
+    const user = await User.update({ where: { id: params.id } }, {
+      username: body.username,
+      email: body.email,
+      name: body.name,
+    });
+
+    if (user.active === false) {
+      throw new ApiError('User not found', 400);
+    }
+
+    if (body.name === undefined) {
+      throw new ApiError('Payload can only contain username, email or name', 400);
+    }
+
+    if (body.username === undefined) {
+      throw new ApiError('Payload can only contain username, email or name', 400);
+    }
+
+    if (body.email === undefined) {
+      throw new ApiError('Payload can only contain username, email or name', 400);
+    }
+
+    res.json(new UserSerializer(user));
+  } catch (err) {
+    next(err);
+  }
+};
+
+const deleteUser = async (req, res, next) => {
+  try {
+    const { params } = req;
+
+    const user = await User.update({ where: { id: params.id } }, { active: false });
+
+    if (user === null) {
+      throw new ApiError('User not found', 400);
+    }
+
+    if (user.active === false) {
+      res.json({ status: 'success', data: null });
+    } else {
+      res.json(new UserSerializer(user));
+    }
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
+  deleteUser,
+  updateUser,
   createUser,
   getUserById,
 };
+
