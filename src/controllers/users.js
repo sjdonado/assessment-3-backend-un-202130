@@ -8,12 +8,12 @@ const createUser = async (req, res, next) => {
   try {
     const { body } = req;
 
-    const nameU = body.name ;
+    const nameU = body.name;
     const UserName = body.username;
     const Email = body.email;
-    const password = body.password;
+    const Contraseña = body.password;
 
-    if (!nameU || !UserName || !password || !Email) {
+    if (!nameU || !UserName || !Contraseña || !Email) {
       const ErrorMenssage = 'Payload must contain name, username, email and password';
       throw new ApiError(ErrorMenssage, 400);
     }
@@ -36,9 +36,9 @@ const createUser = async (req, res, next) => {
 const getUserById = async (req, res, next) => {
   try {
     const { params } = req;
-    const user = await User.findOne({ where: { id: params.id } });   
+    const user = await User.findOne({ where: { id: params.id } });
     const StatusUser = user.active;
-    if (!user || StatusUser === false){
+    if (!user || StatusUser == false){
       const ErrorCode = 'User not found or deactivated';
       throw new ApiError(ErrorCode, 400);
     }
@@ -52,7 +52,7 @@ const deactivateUser = async (req, res, next) => {
   try {
     const { params } = req;
     const user = await User.findOne({ where: { id: params.id } });
-    //Verificamos la existecia y que el usuario a su vez este activado
+    
     const StatusUser = user.active;
     if (!user || StatusUser === false) {
 
@@ -63,7 +63,11 @@ const deactivateUser = async (req, res, next) => {
     }
 
     const DesactivarUsuario = false;
-    await User.update( { where: { id: user.id } } , { active: DesactivarUsuario } )
+
+    await User.update(
+      { where: { id: params.id } },
+      { active: DesactivarUsuario },
+    );
 
     res.json(new BaseSerializer('success',null));
   } catch (err) {
@@ -94,9 +98,12 @@ const updateUser = async (req, res, next) => {
       throw new ApiError(ErrorMenssage, 400);
     }
 
+    const userUpdate = await User.update(
+      { where: { id: params.id } },
+      userData,
+    );
 
-
-    res.json(new UserSerializer(await User.update( { where: { id: params.id } }, userData,)));
+    res.json(new UserSerializer(userUpdate));
   } catch (err) {
     next(err);
   }
