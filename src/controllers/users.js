@@ -7,12 +7,12 @@ const BaseSerializer = require('../serializers/BaseSerializer');
 const createUser = async (req, res, next) => {
   try {
     const { body } = req;
-    let nameU = body.name
-    let UserName = body.username
-    let Email = body.email
-    let password = body.password
-    if(!nameU || !UserName || !password || !Email){
-      let ErrorMenssage = 'Payload must contain name, username, email and password';
+    const nameU = body.name
+    const UserName = body.username
+    const Email = body.email
+    const password = body.password
+    if (!nameU || !UserName || !password || !Email) {
+      const ErrorMenssage = 'Payload must contain name, username, email and password';
       throw new ApiError(ErrorMenssage, 400);
     }
     if (body.password !== body.passwordConfirmation) {
@@ -36,9 +36,9 @@ const getUserById = async (req, res, next) => {
     const { params } = req;
     const user = await User.findOne({ where: { id: params.id } });
     //Verificamos la existecia y que el usuario a su vez este activado
-    let StatusUser = user.active
-    if(!user || StatusUser === false){
-      let ErrorCode = 'User not found or deactivated'
+    const StatusUser = user.active
+    if (!user || StatusUser === false){
+      const ErrorCode = 'User not found or deactivated'
       throw new ApiError(ErrorCode, 400);
     }
     user.active = undefined;
@@ -53,12 +53,12 @@ const deactivateUser = async (req, res, next) => {
     const user = await User.findOne({ where: { id: params.id } });
     //Verificamos la existecia y que el usuario a su vez este activado
     let StatusUser = user.active
-    if(!user || StatusUser === false){
-      let ErrorMenssage = 'User not found or deactivated'
+    if (!user || StatusUser === false) {
+      const ErrorMenssage = 'User not found or deactivated'
       throw new ApiError(ErrorMenssage, 400);
     }
-    DesactivarUsuario = false
-    await User.update({where: {id: user.id}}, {active: DesactivarUsuario})
+    const DesactivarUsuario = false
+    await User.update( {where: { id: user.id } }, { active: DesactivarUsuario } )
 
 
     res.json(new BaseSerializer('success',null));
