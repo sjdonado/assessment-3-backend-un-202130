@@ -39,7 +39,7 @@ const getUserById = async (req, res, next) => {
     const user = await User.findOne({ where: { id: params.id } });
     const StatusUser = user.active;
     if (!user || StatusUser === false) {
-      const ErrorCode = 'User not found or deactivated';
+      const ErrorCode = 'User not found';
       throw new ApiError(ErrorCode, 400);
     }
     user.active = undefined;
@@ -54,7 +54,7 @@ const deactivateUser = async (req, res, next) => {
     const user = await User.findOne({ where: { id: params.id } });
     const StatusUser = user.active;
     if (!user || StatusUser === false) {
-      const ErrorMenssage = 'User not found or deactivated';
+      const ErrorMenssage = 'User not found';
       throw new ApiError(ErrorMenssage, 400);
     }
     const DesactivarUsuario = false;
@@ -77,7 +77,7 @@ const updateUser = async (req, res, next) => {
     const user = await User.findOne({ where: { id: params.id } });
 
     if (!user || !user.active) {
-      const ErrorMenssage = 'User not found or deactivated';
+      const ErrorMenssage = 'User not found';
       throw new ApiError(ErrorMenssage, 400);
     }
 
@@ -88,8 +88,8 @@ const updateUser = async (req, res, next) => {
     };
 
     if (Object.values(userData).some((val) => val === undefined)) {
-      const ErrorMenssage = 'Payload can only contain username, email or name';
-      throw new ApiError(ErrorMenssage, 400);
+      ErrorMenssage2 = 'Payload can only contain username, email or name';
+      throw new ApiError(ErrorMenssage2, 400);
     }
 
     const userUpdate = await User.update(
