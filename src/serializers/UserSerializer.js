@@ -13,4 +13,3 @@ class UserSerializer extends BaseSerializer {
 }
 
 module.exports = UserSerializer;
-
