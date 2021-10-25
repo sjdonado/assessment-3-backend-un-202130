@@ -38,7 +38,7 @@ const getUserById = async (req, res, next) => {
     const { params } = req;
     const user = await User.findOne({ where: { id: params.id } });
     const StatusUser = user.active;
-    if (!user || StatusUser == false){
+    if (!user || StatusUser === false) {
       const ErrorCode = 'User not found or deactivated';
       throw new ApiError(ErrorCode, 400);
     }
@@ -52,24 +52,18 @@ const deactivateUser = async (req, res, next) => {
   try {
     const { params } = req;
     const user = await User.findOne({ where: { id: params.id } });
-    
     const StatusUser = user.active;
     if (!user || StatusUser === false) {
-
       const ErrorMenssage = 'User not found or deactivated';
-
       throw new ApiError(ErrorMenssage, 400);
-
     }
-
     const DesactivarUsuario = false;
-
     await User.update(
       { where: { id: params.id } },
       { active: DesactivarUsuario },
     );
 
-    res.json(new BaseSerializer('success',null));
+    res.json(new BaseSerializer('success', null));
   } catch (err) {
     next(err);
   }
@@ -108,6 +102,7 @@ const updateUser = async (req, res, next) => {
     next(err);
   }
 };
+
 module.exports = {
   createUser,
   getUserById,
