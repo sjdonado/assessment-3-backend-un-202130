@@ -14,7 +14,6 @@ const deactivateUser = async (req, res, next) => {
       throw new ApiError(ErrorMenssage, ErrorCode);
     }
     const DesactivarUsuario = false;
-    
     await User.update(
       { where: { id: req.params.id } },
       { active: DesactivarUsuario },
@@ -25,7 +24,6 @@ const deactivateUser = async (req, res, next) => {
     next(err);
   }
 };
-
 
 const createUser = async (req, res, next) => {
   try {
@@ -73,10 +71,8 @@ const getUserById = async (req, res, next) => {
   }
 };
 
-
 const updateUser = async (req, res, next) => {
   try {
-
     const userFound = await User.findOne({ where: { id: req.params.id } });
     const ErrorMenssage = 'User not found';
     const ErrorCode = 400;
