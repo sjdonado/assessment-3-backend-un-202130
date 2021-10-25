@@ -1,27 +1,11 @@
 # [Template] Tinos API - Users CRUD
 
-Fork this project and modify the `./src/*` files in order to complete your assessment.
+## This work is done to make a CRUD of users in an application.
 
-**IMPORTANT: don't modify the `tests`, `.github`, `models`, `utils` folders and don't install any library. Otherwise your PR will not be reviewed**
+## To prove it: https://github.com/kangcheng322/assessment-3-backend-un-202130
 
-Good luck!
+## When running the tests it is verified that everything is fine.
 
-## Setup
-```
-npm install
-```
-
-## Run in development
-```bash
-docker-compose up
-```
-
-## Run tests
-```bash
-npm run test
-```
-
-## Run linter
-```bash
-npm run linter
-```
+## References: 
+## 1. https://eslint.org/docs/rules/max-len
+## 2. https://developer.mozilla.org/es/docs/Web/JavaScript/Reference/Global_Objects/Object/keys
