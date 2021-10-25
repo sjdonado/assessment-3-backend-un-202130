@@ -7,10 +7,12 @@ const BaseSerializer = require('../serializers/BaseSerializer');
 const createUser = async (req, res, next) => {
   try {
     const { body } = req;
-    const nameU = body.name
-    const UserName = body.username
-    const Email = body.email
-    const password = body.password
+
+    const nameU = body.name ;
+    const UserName = body.username;
+    const Email = body.email;
+    const password = body.password;
+
     if (!nameU || !UserName || !password || !Email) {
       const ErrorMenssage = 'Payload must contain name, username, email and password';
       throw new ApiError(ErrorMenssage, 400);
@@ -34,13 +36,10 @@ const createUser = async (req, res, next) => {
 const getUserById = async (req, res, next) => {
   try {
     const { params } = req;
-    const user = await User.findOne({ where: { id: params.id } });
-
-    //Verificamos la existecia y que el usuario a su vez este activado
-    
-    const StatusUser = user.active
+    const user = await User.findOne({ where: { id: params.id } });   
+    const StatusUser = user.active;
     if (!user || StatusUser === false){
-      const ErrorCode = 'User not found or deactivated'
+      const ErrorCode = 'User not found or deactivated';
       throw new ApiError(ErrorCode, 400);
     }
     user.active = undefined;
@@ -54,16 +53,16 @@ const deactivateUser = async (req, res, next) => {
     const { params } = req;
     const user = await User.findOne({ where: { id: params.id } });
     //Verificamos la existecia y que el usuario a su vez este activado
-    const StatusUser = user.active
+    const StatusUser = user.active;
     if (!user || StatusUser === false) {
 
-      const ErrorMenssage = 'User not found or deactivated'
+      const ErrorMenssage = 'User not found or deactivated';
 
       throw new ApiError(ErrorMenssage, 400);
 
     }
 
-    const DesactivarUsuario = false
+    const DesactivarUsuario = false;
     await User.update( { where: { id: user.id } } , { active: DesactivarUsuario } )
 
     res.json(new BaseSerializer('success',null));
@@ -80,7 +79,7 @@ const updateUser = async (req, res, next) => {
     const user = await User.findOne({ where: { id: params.id } });
 
     if (!user || !user.active) {
-      const ErrorMenssage = 'User not found or deactivated'
+      const ErrorMenssage = 'User not found or deactivated';
       throw new ApiError(ErrorMenssage, 400);
     }
 
@@ -91,7 +90,7 @@ const updateUser = async (req, res, next) => {
     };
 
     if (Object.values(userData).some((val) => val === undefined)) {
-      const ErrorMenssage = 'Payload can only contain username, email or name'
+      const ErrorMenssage = 'Payload can only contain username, email or name';
       throw new ApiError(ErrorMenssage, 400);
     }
 
