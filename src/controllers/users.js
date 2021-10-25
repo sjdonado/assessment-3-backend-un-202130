@@ -11,6 +11,11 @@ const createUser = async (req, res, next) => {
       throw new ApiError('Passwords do not match', 400);
     }
 
+    if (body.name === undefined || body.username === undefined || body.email === undefined
+      || body.password === undefined) {
+      throw new ApiError('Payload must contain name, username, email and password', 400);
+    }
+
     const user = await User.create({
       username: body.username,
       email: body.email,
