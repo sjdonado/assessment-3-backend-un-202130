@@ -38,8 +38,8 @@ const updateUser = async (req, res, next) => {
     if (user.active === false) {
       throw new ApiError('User not found', 400);
     }
-    if (body.username === undefined || body.email === undefined
-      || body.name === undefined) {
+    if ((body.username === undefined && body.email === undefined
+      && body.name === undefined) || body.password !== undefined) {
       throw new ApiError('Payload can only contain username, email or name', 400);
     }
     const updatedUser = await User.update({ where: { id: params.id } }, body);
