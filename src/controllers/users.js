@@ -35,7 +35,9 @@ const getUserById = async (req, res, next) => {
   try {
     const { params } = req;
     const user = await User.findOne({ where: { id: params.id } });
+
     //Verificamos la existecia y que el usuario a su vez este activado
+    
     const StatusUser = user.active
     if (!user || StatusUser === false){
       const ErrorCode = 'User not found or deactivated'
@@ -52,16 +54,50 @@ const deactivateUser = async (req, res, next) => {
     const { params } = req;
     const user = await User.findOne({ where: { id: params.id } });
     //Verificamos la existecia y que el usuario a su vez este activado
-    let StatusUser = user.active
+    const StatusUser = user.active
     if (!user || StatusUser === false) {
+
+      const ErrorMenssage = 'User not found or deactivated'
+
+      throw new ApiError(ErrorMenssage, 400);
+
+    }
+
+    const DesactivarUsuario = false
+    await User.update( { where: { id: user.id } } , { active: DesactivarUsuario } )
+
+    res.json(new BaseSerializer('success',null));
+  } catch (err) {
+    next(err);
+  }
+};
+
+const updateUser = async (req, res, next) => {
+  try {
+    const { params } = req;
+    const { body } = req;
+
+    const user = await User.findOne({ where: { id: params.id } });
+
+    if (!user || !user.active) {
       const ErrorMenssage = 'User not found or deactivated'
       throw new ApiError(ErrorMenssage, 400);
     }
-    const DesactivarUsuario = false
-    await User.update( {where: { id: user.id } }, { active: DesactivarUsuario } )
+
+    const userData = {
+      email: body.email,
+      name: body.name,
+      username: body.username,
+    };
+
+    if (Object.values(userData).some((val) => val === undefined)) {
+      const ErrorMenssage = 'Payload can only contain username, email or name'
+      throw new ApiError(ErrorMenssage, 400);
+    }
 
 
-    res.json(new BaseSerializer('success',null));
+
+    res.json(new UserSerializer(await User.update( { where: { id: params.id } }, userData,)));
   } catch (err) {
     next(err);
   }
@@ -69,6 +105,6 @@ const deactivateUser = async (req, res, next) => {
 module.exports = {
   createUser,
   getUserById,
-  //updateUser,
+  updateUser,
   deactivateUser,
 };
