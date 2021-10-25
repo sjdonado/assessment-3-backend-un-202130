@@ -6,10 +6,19 @@ const UserSerializer = require('../serializers/UserSerializer');
 const createUser = async (req, res, next) => {
   try {
     const { body } = req;
+    // console.log(body);
+    const {
+      username, email, name, password, passwordConfirmation,
+    } = body;
 
-    if (body.password !== body.passwordConfirmation) {
-      throw new ApiError('Passwords do not match', 400);
-    }
+    if (body.password !== body.passwordConfirmation) throw new ApiError('Passwords do not match', 400);
+
+    if (
+      (name === undefined || name.length === 0)
+      || (username === undefined || username.length === 0)
+      || (password === undefined === password === 0)
+      || (email === undefined || email.length === 0)
+    ) { throw new ApiError('Payload must contain name, username, email and password', 400); }
 
     const user = await User.create({
       username: body.username,
