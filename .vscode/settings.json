@@ -1,10 +1,11 @@
 {
   "eslint.run": "onSave",
+  "editor.formatOnSave": false,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true
   },
   "search.exclude": {
     "package-lock.json": true,
-		"coverage/**": true
+    "coverage/**": true
   }
 }
