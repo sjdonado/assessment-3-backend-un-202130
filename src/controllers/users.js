@@ -57,8 +57,38 @@ const deleteUser = async (req, res, next) => {
   }
 };
 
+const updateUser = async (req, res, next) => {
+  try {
+    const { params } = req;
+    const { body } = req;
+
+    let user = await User.findOne({ where: { id: params.id } });
+
+    if (user === undefined || user.active === false) {
+      throw new ApiError('User not found', 400);
+    }
+
+    Object.keys(body).forEach((key) => {
+      if (key !== 'username' && key !== 'email' && key !== 'name') {
+        throw new ApiError('Payload can only contain username, email or name', 400);
+      }
+    });
+
+    user = await User.update({ where: { id: params.id } }, {
+      username: body.username ? body.username : user.username,
+      name: body.name ? body.name : user.name,
+      email: body.email ? body.email : user.email,
+    });
+
+    res.json(new UserSerializer(user));
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   createUser,
   getUserById,
   deleteUser,
+  updateUser,
 };
