@@ -2,23 +2,58 @@ const ApiError = require('../utils/ApiError');
 const User = require('../models/user');
 const UserSerializer = require('../serializers/UserSerializer');
 
+const ErrorMenssage1 = 'Payload must contain name, username, email and password';
+const ErrorMenssage2 = 'Payload can only contain username, email or name';
+const ErrorMenssage = 'User not found';
+const ErrorCode = 400;
+// Todas las verificaciones se realizan aca.
+function VerificacionData(Data, type) {
+  switch (type) {
+    case 1:
+      // El usuario nuevo no contiene name, username, email o contraseña.
+      if (!Data) {
+        throw new ApiError(ErrorMenssage1, ErrorCode);
+      }
+      break;
+    case 2:
+      // El usuario actualizado necesita usename, email o name.
+      if (!Data) {
+        throw new ApiError(ErrorMenssage2, ErrorCode);
+      }
+      break;
+    case 3:
+      // No existen datos del usuario.
+      if (!Data) {
+        throw new ApiError(ErrorMenssage, ErrorCode);
+      }
+      break;
+    case 4:
+      // El usuario no se encuentra activado
+      if (Data !== true) {
+        throw new ApiError(ErrorMenssage, ErrorCode);
+      }
+      break;
+    default:
+      break;
+  }
+}
+
+let i;
 const deactivateUser = async (req, res, next) => {
   try {
     const DatosUsuario = await User.findOne({ where: { id: req.params.id } });
-    const ErrorMenssage = 'User not found';
-    const ErrorCode = 400;
-    if (!DatosUsuario) {
-      throw new ApiError(ErrorMenssage, ErrorCode);
-    }
-    if (!DatosUsuario.active) {
-      throw new ApiError(ErrorMenssage, ErrorCode);
-    }
-    const DesactivarUsuario = false;
+    const s = false;
+    const t3 = 3;
+    const t4 = 4;
+    // Se confirma que existe el usuario
+    VerificacionData(DatosUsuario, t3);
+    // Se confirma que el usuario se enecuentre activo == true
+    VerificacionData(DatosUsuario.active, t4);
+    // Desactivamos el Usuario
     await User.update(
       { where: { id: req.params.id } },
-      { active: DesactivarUsuario },
+      { active: s },
     );
-
     res.json(new UserSerializer(null));
   } catch (err) {
     next(err);
@@ -30,23 +65,20 @@ const createUser = async (req, res, next) => {
     if (req.body.password !== req.body.passwordConfirmation) {
       throw new ApiError('Passwords do not match', 400);
     }
-
-    const nameU = req.body.name;
-    const UserName = req.body.username;
-    const Email = req.body.email;
-    const Contraseña = req.body.password;
-
-    const ErrorMenssage = 'Payload must contain name, username, email and password';
-    const ErrorCode = 400;
-
-    if (!nameU || !UserName || !Contraseña || !Email) {
-      throw new ApiError(ErrorMenssage, ErrorCode);
+    // Almacenamos los datos de nuevos Usuarios
+    const DataNewUser = [req.body.name, req.body.username, req.body.email, req.body.password];
+    let c = 0;
+    const type = 1;
+    // Verificamos que esten completos
+    while (c !== DataNewUser.length) {
+      VerificacionData(DataNewUser[c], type);
+      c += 1;
     }
     res.json(new UserSerializer(await User.create({
-      username: UserName,
-      email: Email,
-      name: nameU,
-      password: Contraseña,
+      name: DataNewUser[0],
+      username: DataNewUser[1],
+      email: DataNewUser[2],
+      password: DataNewUser[3],
       active: true,
     })));
   } catch (err) {
@@ -56,16 +88,15 @@ const createUser = async (req, res, next) => {
 
 const getUserById = async (req, res, next) => {
   try {
-    const user = await User.findOne({ where: { id: req.params.id } });
-    const ErrorMenssage = 'User not found';
-    const ErrorCode = 400;
-    if (!user) {
-      throw new ApiError(ErrorMenssage, ErrorCode);
-    }
-    if (!user.active) {
-      throw new ApiError(ErrorMenssage, ErrorCode);
-    }
-    res.json(new UserSerializer(user));
+    const DatosUsuario = await User.findOne({ where: { id: req.params.id } });
+    // Tipo de verificacion
+    const t3 = 3;
+    const t4 = 4;
+    // Se confirma que existe el usuario
+    VerificacionData(DatosUsuario, t3);
+    // Se confirma que el usuario se enecuentre activo == true
+    VerificacionData(DatosUsuario.active, t4);
+    res.json(new UserSerializer(DatosUsuario));
   } catch (err) {
     next(err);
   }
@@ -73,27 +104,28 @@ const getUserById = async (req, res, next) => {
 
 const updateUser = async (req, res, next) => {
   try {
-    const userFound = await User.findOne({ where: { id: req.params.id } });
-    const ErrorMenssage = 'User not found';
-    const ErrorCode = 400;
-    if (!userFound) {
-      throw new ApiError(ErrorMenssage, ErrorCode);
+    const DatosUsuario = await User.findOne({ where: { id: req.params.id } });
+    // Tipo de verificacion
+    const t3 = 3;
+    const t4 = 4;
+    // Se confirma que existe el usuario
+    VerificacionData(DatosUsuario, t3);
+    // Se confirma que el usuario se enecuentre activo == true
+    VerificacionData(DatosUsuario.active, t4);
+    // Se almacenan los datos a actualizar
+    const DataUser = [req.body.name, req.body.username, req.body.email];
+    let c = 0;
+    const type = 2;
+    // Verificacion de datos a actualizar existan
+    while (c !== DataUser.length) {
+      VerificacionData(DataUser[c], type);
+      c += 1;
     }
-    if (!userFound.active) {
-      throw new ApiError(ErrorMenssage, ErrorCode);
-    }
-    const Nombre = req.body.name;
-    const Usuario = req.body.username;
-    const Correo = req.body.email;
-    const ErrorMenssage2 = 'Payload can only contain username, email or name';
-    if (!Nombre && !Usuario && !Correo) {
-      throw new ApiError(ErrorMenssage2, ErrorCode);
-    }
-
     res.json(new UserSerializer(await User.update({ where: { id: req.params.id } }, {
-      name: Nombre,
-      username: Usuario,
-      email: Correo,
+      // Se envian datos actualizados
+      name: DataUser[0],
+      username: DataUser[1],
+      email: DataUser[2],
     })));
   } catch (err) {
     next(err);
