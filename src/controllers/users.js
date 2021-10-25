@@ -2,17 +2,41 @@ const ApiError = require('../utils/ApiError');
 const User = require('../models/user');
 const UserSerializer = require('../serializers/UserSerializer');
 
+const deactivateUser = async (req, res, next) => {
+  try {
+    const DatosUsuario = await User.findOne({ where: { id: req.params.id } });
+    const ErrorMenssage = 'User not found';
+    const ErrorCode = 400;
+    if (!DatosUsuario) {
+      throw new ApiError(ErrorMenssage, ErrorCode);
+    }
+    if (!DatosUsuario.active) {
+      throw new ApiError(ErrorMenssage, ErrorCode);
+    }
+    const DesactivarUsuario = false;
+    
+    await User.update(
+      { where: { id: req.params.id } },
+      { active: DesactivarUsuario },
+    );
+
+    res.json(new UserSerializer(null));
+  } catch (err) {
+    next(err);
+  }
+};
+
+
 const createUser = async (req, res, next) => {
   try {
-    const { body } = req;
-    if (body.password !== body.passwordConfirmation) {
+    if (req.body.password !== req.body.passwordConfirmation) {
       throw new ApiError('Passwords do not match', 400);
     }
 
-    const nameU = body.name;
-    const UserName = body.username;
-    const Email = body.email;
-    const Contraseña = body.password;
+    const nameU = req.body.name;
+    const UserName = req.body.username;
+    const Email = req.body.email;
+    const Contraseña = req.body.password;
 
     const ErrorMenssage = 'Payload must contain name, username, email and password';
     const ErrorCode = 400;
@@ -34,8 +58,7 @@ const createUser = async (req, res, next) => {
 
 const getUserById = async (req, res, next) => {
   try {
-    const { params } = req;
-    const user = await User.findOne({ where: { id: params.id } });
+    const user = await User.findOne({ where: { id: req.params.id } });
     const ErrorMenssage = 'User not found';
     const ErrorCode = 400;
     if (!user) {
@@ -50,37 +73,11 @@ const getUserById = async (req, res, next) => {
   }
 };
 
-const deactivateUser = async (req, res, next) => {
-  try {
-    const { params } = req;
-    const user = await User.findOne({ where: { id: params.id } });
-    const ErrorMenssage = 'User not found';
-    const ErrorCode = 400;
-    if (!user) {
-      throw new ApiError(ErrorMenssage, ErrorCode);
-    }
-    if (!user.active) {
-      throw new ApiError(ErrorMenssage, ErrorCode);
-    }
-    const DesactivarUsuario = false;
-
-    await User.update(
-      { where: { id: params.id } },
-      { active: DesactivarUsuario },
-    );
-
-    res.json(new UserSerializer(null));
-  } catch (err) {
-    next(err);
-  }
-};
 
 const updateUser = async (req, res, next) => {
   try {
-    const { body } = req;
-    const { params } = req;
 
-    const userFound = await User.findOne({ where: { id: params.id } });
+    const userFound = await User.findOne({ where: { id: req.params.id } });
     const ErrorMenssage = 'User not found';
     const ErrorCode = 400;
     if (!userFound) {
@@ -89,17 +86,15 @@ const updateUser = async (req, res, next) => {
     if (!userFound.active) {
       throw new ApiError(ErrorMenssage, ErrorCode);
     }
-
-    const Nombre = body.name;
-    const Usuario = body.username;
-    const Correo = body.email;
+    const Nombre = req.body.name;
+    const Usuario = req.body.username;
+    const Correo = req.body.email;
     const ErrorMenssage2 = 'Payload can only contain username, email or name';
-    const ErrorCode2 = 400;
     if (!Nombre && !Usuario && !Correo) {
-      throw new ApiError(ErrorMenssage2, ErrorCode2);
+      throw new ApiError(ErrorMenssage2, ErrorCode);
     }
 
-    res.json(new UserSerializer(await User.update({ where: { id: params.id } }, {
+    res.json(new UserSerializer(await User.update({ where: { id: req.params.id } }, {
       name: Nombre,
       username: Usuario,
       email: Correo,
