@@ -11,7 +11,7 @@ const createUser = async (req, res, next) => {
       username, email, name, password, passwordConfirmation,
     } = body;
 
-    if (body.password !== body.passwordConfirmation) throw new ApiError('Passwords do not match', 400);
+    if (password !== passwordConfirmation) throw new ApiError('Passwords do not match', 400);
 
     if (
       (name === undefined || name.length === 0)
@@ -21,10 +21,10 @@ const createUser = async (req, res, next) => {
     ) { throw new ApiError('Payload must contain name, username, email and password', 400); }
 
     const user = await User.create({
-      username: body.username,
-      email: body.email,
-      name: body.name,
-      password: body.password,
+      username,
+      email,
+      name,
+      password,
     });
 
     res.json(new UserSerializer(user));
