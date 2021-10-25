@@ -36,7 +36,46 @@ const getUserById = async (req, res, next) => {
   }
 };
 
+const updateUser = async (req, res, next) => {
+  try {
+    const { params } = req;
+    const { body } = req;
+
+    const user = await User.update(
+      { where: { id: params.id } },
+      {
+        username: body.username,
+        name: body.name,
+        email: body.email,
+      },
+    );
+
+    res.json(new UserSerializer(user));
+  } catch (err) {
+    next(err);
+  }
+};
+
+const deactivateUser = async (req, res, next) => {
+  try {
+    const { params } = req;
+
+    const user = await User.update(
+      { where: { id: params.id } },
+      {
+        active: false,
+      },
+    );
+
+    res.json(new UserSerializer(null));
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   createUser,
   getUserById,
+  updateUser,
+  deactivateUser,
 };
