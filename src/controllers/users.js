@@ -64,8 +64,25 @@ const updateUser = async (req, res, next) => {
   }
 }
 
+const deactivateUser = async (req, res, next) => {
+  try {
+    const { params } = req;
+
+    const user = await User.update({ where: { id: params.id } }, { active: false });
+
+    if (!user) {
+      throw new ApiError('User not found', 400);
+    }
+
+    res.json({ status: 'success', data: null })
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = {
   createUser,
   getUserById,
   updateUser,
+  deactivateUser,
 };
