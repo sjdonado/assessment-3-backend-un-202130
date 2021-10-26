@@ -33,7 +33,7 @@ const getUserById = async (req, res, next) => {
     const { params } = req;
 
     const user = await User.findOne({ where: { id: params.id } });
-    if (!user || !user.active) {
+    if (!user || user.active === false) {
       throw new ApiError('User not found', 400);
     }
     user.active = undefined;
@@ -45,12 +45,26 @@ const getUserById = async (req, res, next) => {
 
 const updateUser = async (req, res, next) => {
   try {
+    const { body } = req;
     const [userId, username, name, email] = [
       req.params.id,
-      req.body.username,
-      req.body.name,
-      req.body.email,
+      body.username,
+      body.name,
+      body.email,
     ];
+    const allowedProperties = ['username', 'name', 'email'];
+    const bodyProperties = Object.keys(body);
+    let badPayload = false;
+    bodyProperties.forEach((propertie) => {
+      if (!allowedProperties.includes(propertie)) {
+        badPayload = true;
+      }
+    });
+    if (badPayload) throw new ApiError('Payload can only contain username, email or name', 400);
+    const user = await User.findOne({ where: { id: userId } });
+    if (user?.active === false) {
+      throw new ApiError('User not found', 400);
+    }
     const updatedUser = await User.update({ where: { id: userId } }, {
       username, name, email,
     });
