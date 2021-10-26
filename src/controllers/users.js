@@ -74,8 +74,22 @@ const updateUser = async (req, res, next) => {
   }
 };
 
+const desactivateUser = async (req, res, next) => {
+  try {
+    const userId = req.params.id;
+
+    const updatedUser = await User.update({ where: { id: userId } }, {
+      active: false,
+    });
+    res.json(new UserSerializer(updatedUser));
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   createUser,
   getUserById,
   updateUser,
+  desactivateUser,
 };
