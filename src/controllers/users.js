@@ -3,8 +3,8 @@ const ApiError = require('../utils/ApiError');
 const User = require('../models/user');
 const UserSerializer = require('../serializers/UserSerializer');
 
-function ThrowError(message, code) {
-  if (message !== '') throw new ApiError(message, code);
+function ThrowError(msg, code) {
+  if (msg !== '') throw new ApiError(msg, code);
 }
 
 const finalError = {
@@ -17,7 +17,6 @@ const createUser = async (req, res, next) => {
   finalError.code = '';
   try {
     const { body } = req;
-    // const bodyKeys = Object.keys(body);
     if (body.password !== body.passwordConfirmation) {
       throw new ApiError('Passwords do not match', 400);
     }
@@ -43,19 +42,14 @@ const createUser = async (req, res, next) => {
 };
 
 const getUserById = async (req, res, next) => {
-  finalError.message = 'User not found';
-  finalError.code = 400;
-
   try {
     const { params } = req;
 
     const user = await User.findOne({ where: { id: params.id } });
 
     if (user === undefined || user.active === false) {
-      ThrowError(finalError.message, finalError.code);
+      throw new ApiError('User not found', 400);
     }
-
-    // user.active = undefined;
 
     res.json(new UserSerializer(user));
   } catch (err) {
@@ -64,26 +58,35 @@ const getUserById = async (req, res, next) => {
 };
 
 const updateUser = async (req, res, next) => {
-  finalError.message = 'User not found';
-  finalError.code = 400;
+  finalError.message = '';
+  finalError.code = '';
 
   try {
     const { params } = req;
     const { body } = req;
-    const { name, username, email } = req.body;
     const user = await User.findOne({ where: { id: params.id } });
 
-    if (!name || !username || !email) {
+    const dataBody = Object.keys(body);
+    const dataUpdate = ['name', 'username', 'email'];
+
+    const payloadValid = dataBody.map((item) => {
+      let validData = true;
+      if (!dataUpdate.includes(item)) {
+        validData = false;
+      }
+      return validData;
+    });
+
+    if (payloadValid.includes(false)) {
       throw new ApiError('Payload can only contain username, email or name', 400);
-    } else {
-      user.name = name;
-      user.username = username;
-      user.email = email;
     }
 
     if (user === undefined || user.active === false) {
-      ThrowError(finalError.message, finalError.code);
+      finalError.message = 'User not found';
+      finalError.code = 400;
     }
+
+    ThrowError(finalError.message, finalError.code);
 
     const newDataUser = await User.update({ where: { id: params.id } }, body);
     res.json(new UserSerializer(newDataUser));
@@ -101,14 +104,14 @@ const desactiverUser = async (req, res, next) => {
       throw new ApiError('User not found', 400);
     }
 
-    const userNull = {
+    const data = {
       status: 'success',
       data: null,
     };
 
     user.active = false;
     User.update({ where: { id: params.id } }, user);
-    res.json(userNull);
+    res.json(data);
   } catch (err) {
     next(err);
   }
