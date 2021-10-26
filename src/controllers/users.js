@@ -36,8 +36,6 @@ const createUser = async (req, res, next) => {
       password: body.password,
     });
 
-    user.active = undefined;
-
     res.json(new UserSerializer(user));
   } catch (err) {
     next(err);
@@ -57,7 +55,7 @@ const getUserById = async (req, res, next) => {
       ThrowError(finalError.message, finalError.code);
     }
 
-    user.active = undefined;
+    // user.active = undefined;
 
     res.json(new UserSerializer(user));
   } catch (err) {
@@ -66,8 +64,8 @@ const getUserById = async (req, res, next) => {
 };
 
 const updateUser = async (req, res, next) => {
-  finalError.message = '';
-  finalError.code = '';
+  finalError.message = 'User not found';
+  finalError.code = 400;
 
   try {
     const { params } = req;
@@ -84,14 +82,33 @@ const updateUser = async (req, res, next) => {
     }
 
     if (user === undefined || user.active === false) {
-      finalError.message = 'User not found';
-      finalError.code = 400;
+      ThrowError(finalError.message, finalError.code);
     }
-
-    ThrowError(finalError.message, finalError.code);
 
     const newDataUser = await User.update({ where: { id: params.id } }, body);
     res.json(new UserSerializer(newDataUser));
+  } catch (err) {
+    next(err);
+  }
+};
+
+const desactiverUser = async (req, res, next) => {
+  try {
+    const { params } = req;
+    const user = await User.findOne({ where: { id: params.id } });
+
+    if (user === undefined || user.active === false) {
+      throw new ApiError('User not found', 400);
+    }
+
+    const userNull = {
+      status: 'success',
+      data: null,
+    };
+
+    user.active = false;
+    User.update({ where: { id: params.id } }, user);
+    res.json(userNull);
   } catch (err) {
     next(err);
   }
@@ -101,4 +118,5 @@ module.exports = {
   createUser,
   getUserById,
   updateUser,
+  desactiverUser,
 };
