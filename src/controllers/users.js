@@ -84,6 +84,13 @@ const updateUser = async (req, res, next) => {
 const deactivateUser = async (req, res, next) => {
   try {
     const { params } = req;
+    // revisar si el usuario existe
+
+    const existUser = await User.findOne({ where: { id: params.id } });
+
+    // console.log(existUser);
+
+    if (existUser?.active === false || existUser === undefined) throw new ApiError('User not found', 400);
 
     const user = await User.update(
       { where: { id: params.id } },
