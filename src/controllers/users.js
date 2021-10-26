@@ -35,7 +35,7 @@ const updateUser = async (req, res, next) => {
 
     const user = await User.findOne({ where: { id: params.id } });
 
-    if (user.active === false) {
+    if (!user || user.active === false) {
       throw new ApiError('User not found', 400);
     }
     if ((body.username === undefined && body.email === undefined
