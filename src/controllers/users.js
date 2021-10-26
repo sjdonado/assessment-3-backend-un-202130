@@ -4,15 +4,16 @@ const User = require('../models/user');
 const UserSerializer = require('../serializers/UserSerializer');
 
 async function validateAndFindKey(Objectdata) {
-  let sw = false;
+  let sw = true;
 
   if (await Objectdata.find((key) => key === 'username') && await Objectdata.find((key) => key === 'email') && await Objectdata.find((key) => key === 'name')) {
-    sw = true;
+    sw = false;
   }
   if (sw) {
+    throw new ApiError('Payload can only contain username, email or name', 400);
+  } else {
     return true;
   }
-  return false;
 }
 
 async function validateUndefine(info) {
@@ -92,8 +93,6 @@ const updateUser = async (req, res, next) => {
     if (await validateAndFindKey(Object.keys(data))) {
       const UserUpdated = await User.update({ where: { id: params.id } }, data);
       res.json(new UserSerializer(UserUpdated));
-    } else {
-      throw new ApiError('Payload can only contain username, email or name', 400);
     }
   } catch (err) {
     next(err);
