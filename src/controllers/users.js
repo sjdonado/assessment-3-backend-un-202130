@@ -16,6 +16,7 @@ const createUser = async (req, res, next) => {
       email: body.email,
       name: body.name,
       password: body.password,
+      active: true,
     });
 
     res.json(new UserSerializer(user));
@@ -23,7 +24,42 @@ const createUser = async (req, res, next) => {
     next(err);
   }
 };
-
+const deleteUser = async (req, res, next) => {
+  try {
+    const { params } = req;
+    const { body } = req; 
+    const user = await User.update(
+      { where :  { id: params.id }, newValues : {
+        username: body.username,
+        email: body.email,
+        name: body.name,
+        password: body.password,
+        active: body.active,
+      }
+    });
+    res.json(new UserSerializer(user));
+  } catch (err) {
+    next(err);
+  }
+};
+const updateUser = async (req, res, next) => {
+  try {
+    const { params } = req;
+    const { body } = req; 
+    const user = await User.update(
+      { where :  { id: params.id }, newValues : {
+        username: body.username,
+        email: body.email,
+        name: body.name,
+        password: body.password,
+        active: body.active,
+      }
+    });
+    res.json(new UserSerializer(user));
+  } catch (err) {
+    next(err);
+  }
+};
 const getUserById = async (req, res, next) => {
   try {
     const { params } = req;
@@ -39,4 +75,6 @@ const getUserById = async (req, res, next) => {
 module.exports = {
   createUser,
   getUserById,
+  updateUser,
+  deleteUser,
 };
