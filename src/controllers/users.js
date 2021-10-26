@@ -84,12 +84,16 @@ const deactivateUser = async (req, res, next) => {
 
     const user = await User.findOne({ where: { id: params.id } });
     if (user) {
-      const userDeactivated = await User.update(
-        { where: { id: params.id } },
-        { active: false },
-      );
+      if (user.active === undefined || user.active) {
+        const userDeactivated = await User.update(
+          { where: { id: params.id } },
+          { active: false },
+        );
 
-      res.json(new UserSerializer(null));
+        res.json(new UserSerializer(null));
+      } else {
+        throw new ApiError('success', 200);
+      }
     } else {
       throw new ApiError('User not found', 400);
     }

@@ -17,7 +17,7 @@ const create = (user) => new Promise((resolve, reject) => {
     createdAt: new Date(),
     updatedAt: new Date(),
     lastLoginDate: null,
-    active: true,
+    active: undefined,
     ...user,
   };
 
