@@ -15,18 +15,31 @@ async function validateAndFindKey(Objectdata) {
   return false;
 }
 
+async function validateUndefine(info) {
+  let sw = false;
+
+  if (info.name === undefined || info.username === undefined || info.email === undefined) {
+    if (info.passwordConfirmation === undefined || info.password === undefined) {
+      sw = true;
+    }
+    sw = true;
+  }
+  if (sw) {
+    throw new ApiError('Payload must contain name, username, email and password', 400);
+  }
+  return false;
+}
+
 const createUser = async (req, res, next) => {
   try {
     const data = req.body;
-    if (data.name === undefined || data.username === undefined || data.email === undefined) {
-      if (data.passwordConfirmation === undefined || data.password === undefined) {
-        throw new ApiError('Payload must contain name, username, email and password', 400);
-      }
-      throw new ApiError('Payload must contain name, username, email and password', 400);
-    }
+
     if (data.password !== data.passwordConfirmation) {
       throw new ApiError('Passwords do not match', 400);
     }
+
+    await validateUndefine(data);
+
     const dataUserInsert = {
       username: data.username,
       email: data.email,
