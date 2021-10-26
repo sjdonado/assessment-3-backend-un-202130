@@ -10,6 +10,18 @@ const createUser = async (req, res, next) => {
     if (body.password !== body.passwordConfirmation) {
       throw new ApiError('Passwords do not match', 400);
     }
+    if (
+      !body.username
+      || !body.name
+      || !body.email
+      || !body.password
+      || !body.passwordConfirmation
+    ) {
+      throw new ApiError(
+        'Payload must contain name, username, email and password',
+        400,
+      );
+    }
 
     const user = await User.create({
       username: body.username,
@@ -30,7 +42,56 @@ const getUserById = async (req, res, next) => {
 
     const user = await User.findOne({ where: { id: params.id } });
 
+    if (!user || !user.active) {
+      throw new ApiError('User not found', 400);
+    }
+
     res.json(new UserSerializer(user));
+  } catch (err) {
+    next(err);
+  }
+};
+
+const updateUser = async (req, res, next) => {
+  try {
+    const { params, body } = req;
+
+    if (
+      Object.keys(body).some(
+        (key) => key !== 'username' && key !== 'name' && key !== 'email',
+      )
+    ) {
+      throw new ApiError(
+        'Payload can only contain username, email or name',
+        400,
+      );
+    }
+
+    const user = await User.update({ where: { id: params.id } }, body);
+
+    if (!user || !user.active) {
+      throw new ApiError('User not found', 400);
+    }
+
+    res.json(new UserSerializer(user));
+  } catch (err) {
+    next(err);
+  }
+};
+
+const deactivateUser = async (req, res, next) => {
+  try {
+    const { params } = req;
+    const user = await User.update(
+      { where: { id: params.id } },
+      { active: false },
+    );
+
+    if (!user) {
+      throw new ApiError('User not found', 400);
+    }
+
+    res.json(new UserSerializer(null));
   } catch (err) {
     next(err);
   }
@@ -39,4 +100,6 @@ const getUserById = async (req, res, next) => {
 module.exports = {
   createUser,
   getUserById,
+  updateUser,
+  deactivateUser,
 };
