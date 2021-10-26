@@ -49,17 +49,29 @@ const getUserById = async (req, res, next) => {
   }
 };
 
+function hasSameProps(obj1, obj2) {
+  return Object.keys(obj1).every((prop) => Object.hasOwnProperty.call(obj2, prop));
+}
+
 const updateUser = async (req, res, next) => {
   try {
     const { params } = req;
     const { body } = req;
 
+    const { username, name, email } = body;
+    const idealObject = { username, name, email };
+
+    const userQuery = await User.findOne({ where: { id: params.id } });
+    if (userQuery.active === false) throw new ApiError('User not found', 400);
+    if (!hasSameProps(idealObject, body)) throw new ApiError('Payload can only contain username, email or name', 400);
+    // console.log(params.id);
+
     const user = await User.update(
       { where: { id: params.id } },
       {
-        username: body.username,
-        name: body.name,
-        email: body.email,
+        username,
+        name,
+        email,
       },
     );
 
