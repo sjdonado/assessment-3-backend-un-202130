@@ -13,8 +13,8 @@ const createUser = async (req, res, next) => {
 
     if (!Object.keys(body).includes('name', 'username', 'email', 'password')) {
       throw new ApiError(
-          'Payload must contain name, username, email and password',
-          400,
+        'Payload must contain name, username, email and password',
+        400,
       );
     }
 
@@ -57,52 +57,52 @@ const updateUser = async (req, res, next) => {
     const toUpdate = ['name', 'username', 'email'];
 
     const isValid = data.map((item) => {
-        let isValid = true;
+      let valid = true;
 
-        if (!toUpdate.includes(item)) {
-            isValid = false;
-        }
-        
-        return isValid;
+      if (!toUpdate.includes(item)) {
+        valid = false;
+      }
+
+      return valid;
     });
 
     if (!isValid) {
-        throw new ApiError(
-            'Payload can only contain username, email or name',
-            400,
-        );
+      throw new ApiError(
+        'Payload can only contain username, email or name',
+        400,
+      );
     }
 
     if (user === undefined || user.active === false) {
-        throw new ApiError('User not found', 400);
+      throw new ApiError('User not found', 400);
     }
 
     const userUpdated = await User.update({ where: { id: params.id } }, body);
     res.json(new UserSerializer(userUpdated));
   } catch (err) {
-      next(err);
+    next(err);
   }
 };
 
 const deleteUser = async (req, res, next) => {
   try {
-      const { params } = req;
-      const user = await User.findOne({ where: { id: params.id } });
+    const { params } = req;
+    const user = await User.findOne({ where: { id: params.id } });
 
-      if (user === undefined || user.active === false) {
-          throw new ApiError('User not found', 400);
-      }
+    if (user === undefined || user.active === false) {
+      throw new ApiError('User not found', 400);
+    }
 
-      const data = {
-          status: 'success',
-          data: null,
-      };
+    const data = {
+      status: 'success',
+      data: null,
+    };
 
-      user.active = false;
-      User.update({ where: { id: params.id } }, user);
-      res.json(data);
+    user.active = false;
+    User.update({ where: { id: params.id } }, user);
+    res.json(data);
   } catch (err) {
-      next(err);
+    next(err);
   }
 };
 
@@ -110,5 +110,5 @@ module.exports = {
   createUser,
   getUserById,
   updateUser,
-  deleteUser
+  deleteUser,
 };
