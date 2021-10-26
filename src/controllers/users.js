@@ -6,12 +6,12 @@ const UserSerializer = require('../serializers/UserSerializer');
 async function validateAndFindKey(Objectdata) {
   let sw = false;
 
-  if (await Objectdata.find((key) => key == 'username') && await Objectdata.find((key) => key == 'email') && await Objectdata.find((key) => key == 'name')) {
-    sw = true
+  if (await Objectdata.find((key) => key === 'username') && await Objectdata.find((key) => key === 'email') && await Objectdata.find((key) => key === 'name')) {
+    sw = true;
   }
   if (sw) {
     return true;
-  }else{
+  }else {
     return false;
   }
 }
@@ -19,17 +19,17 @@ async function validateAndFindKey(Objectdata) {
 const createUser = async (req, res, next) => {
   try {
     const data = req.body;
-    if (data.name == undefined || data.username == undefined || data.email == undefined || data.passwordConfirmation == undefined ||  data.password == undefined) {
+    if (data.name === undefined || data.username === undefined || data.email === undefined || data.passwordConfirmation === undefined ||  data.password === undefined) {
       throw new ApiError('Payload must contain name, username, email and password', 400);
     }
-    if (data.password !== data.passwordConfirmation) {
+    if (data.password != data.passwordConfirmation) {
       throw new ApiError('Passwords do not match', 400);
     }
     const dataUserInsert ={
-      username: body.username,
-        email: body.email,
-        name: body.name,
-        password: body.password,
+      username: data.username,
+        email: data.email,
+        name: data.name,
+        password: data.password,
         active: true,
     }
       const user = await User.create(dataUserInsert);
@@ -47,7 +47,7 @@ const getUserById = async (req, res, next) => {
 
     const user = await User.findOne({ where: { id: id } });
 
-    if (user == undefined) {
+    if (user === undefined) {
       throw new ApiError('User not found', 400);
     }
 
@@ -61,14 +61,14 @@ const getUserById = async (req, res, next) => {
   }
 };
 
-const UpdateUser = async (req, res, next) => {
+const updateUser = async (req, res, next) => {
   try {
     const data = req.body;
     const { id } = req.params
 
     const user = await User.findOne({ where: { id: id } });
 
-    if (user == undefined) {
+    if (user === undefined) {
       throw new ApiError('User not found', 404);
     }
 
@@ -77,8 +77,8 @@ const UpdateUser = async (req, res, next) => {
     }
 
     if (await validateAndFindKey(Object.keys(data))) {
-      const Userupdated = await User.update({ where: { id: id } }, data);
-      res.json(new UserSerializer(Userupdated));
+      const UserUpdated = await User.update({ where: { id: id } }, data);
+      res.json(new UserSerializer(UserUpdated));
     } else {
       throw new ApiError('Payload can only contain username, email or name', 400);
     }
@@ -88,13 +88,22 @@ const UpdateUser = async (req, res, next) => {
 };
 
 
-const DeleteUser = async (req, res, next) => {
+const deactivateUser = async (req, res, next) => {
   try {
-    const { params } = req;
+    const { id } = req.params;
 
-    const user = await User.findOne({ where: { id: params.id } });
+    const user = await User.findOne({ where: { id: id } });
 
-    res.json(new UserSerializer(user));
+    if (user === undefined) {
+      throw new ApiError('User not found', 400);
+    }
+
+    if (!user.active) {
+      throw new ApiError('User not found', 400);
+    }
+
+    await User.update({ where: { id: id } }, { active: false });
+    res.json(new UserSerializer(null));
   } catch (err) {
     next(err);
   }
@@ -103,6 +112,6 @@ const DeleteUser = async (req, res, next) => {
 module.exports = {
   createUser,
   getUserById,
-  UpdateUser,
-  DeleteUser
+  updateUser,
+  deactivateUser
 };
