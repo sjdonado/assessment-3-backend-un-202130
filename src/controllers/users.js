@@ -52,7 +52,19 @@ const updateUser = async (req, res, next) => {
       throw new ApiError('Payload can only contain username, email or name', 400);
     }
 
-    const user = await User.update({ where: { id: params.id, active: true } }, { username: body.username, email: body.email, name: body.name });
+    const user = await User.update(
+      {
+        where: {
+          id: params.id,
+          active: true,
+        },
+      },
+      {
+        username: body.username,
+        email: body.email,
+        name: body.name,
+      },
+    );
 
     if (!user || !user.active) {
       throw new ApiError('User not found', 400);
@@ -62,7 +74,7 @@ const updateUser = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-}
+};
 
 const deactivateUser = async (req, res, next) => {
   try {
@@ -74,11 +86,11 @@ const deactivateUser = async (req, res, next) => {
       throw new ApiError('User not found', 400);
     }
 
-    res.json({ status: 'success', data: null })
+    res.json({ status: 'success', data: null });
   } catch (err) {
     next(err);
   }
-}
+};
 
 module.exports = {
   createUser,
