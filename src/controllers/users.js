@@ -9,11 +9,11 @@ const createUser = async (req, res, next) => {
     const { body } = req;
 
     if (body.password !== body.passwordConfirmation) {
-      throw new ApiError('Error 400; Passwords do not match', 400);
+      throw new ApiError('Passwords do not match', 400);
     }
 
     if (body === undefined || body.id === undefined || body.active === false) {
-      throw new ApiError('Error 400; Payload must contain all fields!', 400);
+      throw new ApiError('Payload must contain name, username, email or password', 400);
     }
 
     const user = await User.create({
@@ -37,7 +37,7 @@ const deactivateUser = async (req, res, next) => {
     const user = await User.findOne({ where: { id: params.id } });
 
     if (user === undefined || user.id === undefined || user.active === false) {
-      throw new ApiError('Error 400; User not found!', 400);
+      throw new ApiError('User not found', 400);
     }
 
     await User.update(
@@ -59,7 +59,7 @@ const getUserById = async (req, res, next) => {
     const user = await User.findOne({ where: { id: params.id } });
 
     if (user === undefined || user.id === undefined || user.active === undefined) {
-      throw new ApiError('Error 400; User not found!', 400);
+      throw new ApiError('User not found', 400);
     }
 
     res.json(new UserSerializer(user));
@@ -76,13 +76,13 @@ const updateUser = async (req, res, next) => {
     let user = await User.findOne({ where: { id: params.id } });
 
     if (user === undefined || user.id === undefined || user.active === false) {
-      throw new ApiError('Error 400; User not found!', 400);
+      throw new ApiError('User not found', 400);
     }
 
     Object.keys(body).forEach(
       (usrd) => {
         if (usrd !== 'username' && usrd !== 'email' && usrd !== 'name') {
-          throw new ApiError('Error 400; Payload must contain username, email or name', 400);
+          throw new ApiError('Payload can only contain username, email or name', 400);
         }
       },
     );
