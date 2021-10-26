@@ -3,12 +3,17 @@ const ApiError = require('../utils/ApiError');
 const User = require('../models/user');
 const UserSerializer = require('../serializers/UserSerializer');
 
+// Create new user
 const createUser = async (req, res, next) => {
   try {
     const { body } = req;
 
     if (body.password !== body.passwordConfirmation) {
-      throw new ApiError('Passwords do not match', 400);
+      throw new ApiError('Error 400; Passwords do not match', 400);
+    }
+
+    if (body === undefined || body.id === undefined || body.active === false) {
+      throw new ApiError('Error 400; Payload must contain all fields!', 400);
     }
 
     const user = await User.create({
@@ -24,6 +29,7 @@ const createUser = async (req, res, next) => {
   }
 };
 
+// Deactivate User
 const deactivateUser = async (req, res, next) => {
   try {
     const { params } = req;
@@ -31,7 +37,7 @@ const deactivateUser = async (req, res, next) => {
     const user = await User.findOne({ where: { id: params.id } });
 
     if (user === undefined || user.id === undefined || user.active === false) {
-      throw new ApiError('Error, User not found!', 400);
+      throw new ApiError('Error 400; User not found!', 400);
     }
 
     await User.update(
@@ -45,11 +51,16 @@ const deactivateUser = async (req, res, next) => {
   }
 };
 
+// Get user by ID
 const getUserById = async (req, res, next) => {
   try {
     const { params } = req;
 
     const user = await User.findOne({ where: { id: params.id } });
+
+    if (user === undefined || user.id === undefined || user.active === undefined) {
+      throw new ApiError('Error 400; User not found!', 400);
+    }
 
     res.json(new UserSerializer(user));
   } catch (err) {
@@ -57,6 +68,7 @@ const getUserById = async (req, res, next) => {
   }
 };
 
+// Update User
 const updateUser = async (req, res, next) => {
   try {
     const { params, body } = req;
@@ -64,12 +76,23 @@ const updateUser = async (req, res, next) => {
     let user = await User.findOne({ where: { id: params.id } });
 
     if (user === undefined || user.id === undefined || user.active === false) {
-      throw new ApiError('Error, User not found!', 400);
+      throw new ApiError('Error 400; User not found!', 400);
     }
 
+    Object.keys(body).forEach(
+      (usrd) => {
+        if (usrd !== 'username' && usrd !== 'email' && usrd !== 'name') {
+          throw new ApiError('Error 400; Payload must contain username, email or name', 400);
+        }
+      },
+    );
+
     user = await User.update(
-      { where: { id: params.id } },
-      { username: body.username ? body.username : user.username },
+      { where: { id: params.id } }, {
+        username: body.username ? body.username : user.username,
+        name: body.name ? body.name : user.name,
+        email: body.email ? body.email : user.email,
+      },
     );
 
     res.json(new UserSerializer(user));
