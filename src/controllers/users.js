@@ -11,6 +11,10 @@ const createUser = async (req, res, next) => {
       throw new ApiError('Passwords do not match', 400);
     }
 
+    if (!body.username || !body.email || !body.name || !body.password) {
+      throw new ApiError('Payload must contain name, username, email and password', 400);
+    }
+
     const user = await User.create({
       username: body.username,
       email: body.email,
@@ -29,8 +33,35 @@ const getUserById = async (req, res, next) => {
     const { params } = req;
 
     const user = await User.findOne({ where: { id: params.id } });
+    if (!user || !user.active) throw new ApiError('User not found', 400);
 
     res.json(new UserSerializer(user));
+  } catch (err) {
+    next(err);
+  }
+};
+
+const updateUser = async (req, res, next) => {
+  try {
+    const { params, body } = req;
+    if (!body.username || !body.email || !body.name) {
+      throw new ApiError('Payload can only contain username, email or name', 400);
+    }
+    const userUpdate = await User.update({ where: { id: params.id, active: true } }, body);
+    if (!userUpdate) throw new ApiError('User not found', 400);
+    res.json(new UserSerializer(userUpdate));
+  } catch (err) {
+    next(err);
+  }
+};
+
+const disabledUser = async (req, res, next) => {
+  try {
+    const { params } = req;
+    const userDisabled = await User.update({ where: { id: params.id } }, { active: false });
+    if (!userDisabled) throw new ApiError('User not found', 400);
+
+    res.json({ status: 'success', data: null });
   } catch (err) {
     next(err);
   }
@@ -39,4 +70,6 @@ const getUserById = async (req, res, next) => {
 module.exports = {
   createUser,
   getUserById,
+  updateUser,
+  disabledUser,
 };
