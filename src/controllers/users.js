@@ -66,14 +66,13 @@ const updateUser = async (req, res, next) => {
     }
     const userUpd = await User.update(
       {
-        where: { id: params.id },
-        newValues: {
-          username: params.username,
-          email: params.email,
-          name: params.name,
-          password: params.password,
-        },
+        where: { id: user.id },
+      }, {
+        username: body.username,
+        email: body.email,
+        name: body.name,
       },
+
     );
     res.json(new UserSerializer(userUpd));
   } catch (err) {
