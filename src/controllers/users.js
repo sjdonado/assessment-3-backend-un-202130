@@ -14,7 +14,7 @@ const deactivateUser = async (req, res, next) => {
     user = await User.update({ where: { id: params.id } }, {
       active: false,
     });
-    res.json(new UserSerializer(user));
+    res.json(new UserSerializer(null));
   } catch (err) {
     next(err);
   }
@@ -28,7 +28,7 @@ const updateUser = async (req, res, next) => {
       throw new ApiError('User not found', 400);
     }
     Object.keys(body).forEach((key) => {
-      if (!(key === 'username' && key === 'email' && key === 'name')) {
+      if (key !== 'username' && key !== 'email' && key !== 'name') {
         throw new ApiError('Payload can only contain username, email or name', 400);
       }
     });
