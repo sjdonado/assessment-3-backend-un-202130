@@ -43,7 +43,25 @@ const getUserById = async (req, res, next) => {
   }
 };
 
+const updateUser = async (req, res, next) => {
+  try {
+    const [userId, username, name, email] = [
+      req.params.id,
+      req.body.username,
+      req.body.name,
+      req.body.email,
+    ];
+    const updatedUser = await User.update({ where: { id: userId } }, {
+      username, name, email,
+    });
+    res.json(new UserSerializer(updatedUser));
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   createUser,
   getUserById,
+  updateUser,
 };
