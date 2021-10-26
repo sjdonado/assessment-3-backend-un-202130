@@ -2,6 +2,7 @@ const ApiError = require('../utils/ApiError');
 
 const User = require('../models/user');
 const UserSerializer = require('../serializers/UserSerializer');
+const BaseSerializer = require('../serializers/BaseSerializer');
 
 // Create new user
 const createUser = async (req, res, next) => {
@@ -45,7 +46,7 @@ const deactivateUser = async (req, res, next) => {
       { active: false },
     );
 
-    res.json(new UserSerializer(user));
+    res.json(new BaseSerializer('success', null));
   } catch (err) {
     next(err);
   }
