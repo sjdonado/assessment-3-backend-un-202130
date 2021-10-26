@@ -19,11 +19,11 @@ const createUser = async (req, res, next) => {
       password: body.password,
     };
 
-    for (const i of Object.values(userParams)) {
-      if (i === undefined) {
+    Object.values(userParams).forEach((value) => {
+      if (value === undefined) {
         throw new ApiError('Payload must contain name, username, email and password', 400);
       }
-    }
+    });
 
     const user = await User.create({
       username: body.username,
@@ -43,11 +43,11 @@ const updateUser = async (req, res, next) => {
     const { body } = req;
     const { params } = req;
 
-    for (const i of Object.keys(body)) {
-      if (i !== 'name' && i !== 'username' && i !== 'email') {
+    Object.keys(body).forEach((key) => {
+      if (key !== 'name' && key !== 'username' && key !== 'email') {
         throw new ApiError('Payload can only contain username, email or name', 400);
       }
-    }
+    });
 
     let user = await User.findOne({ where: { id: params.id } });
 
