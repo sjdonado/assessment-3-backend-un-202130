@@ -21,7 +21,6 @@ const createUser = async (req, res, next) => {
       name: body.name,
       password: body.password,
     });
-    user.active = undefined;
     res.json(new UserSerializer(user));
   } catch (err) {
     next(err);
@@ -36,7 +35,6 @@ const getUserById = async (req, res, next) => {
     if (!user || user.active === false) {
       throw new ApiError('User not found', 400);
     }
-    user.active = undefined;
     res.json(new UserSerializer(user));
   } catch (err) {
     next(err);
@@ -62,7 +60,7 @@ const updateUser = async (req, res, next) => {
     });
     if (badPayload) throw new ApiError('Payload can only contain username, email or name', 400);
     const user = await User.findOne({ where: { id: userId } });
-    if (user?.active === false) {
+    if (!user || user.active === false) {
       throw new ApiError('User not found', 400);
     }
     const updatedUser = await User.update({ where: { id: userId } }, {
