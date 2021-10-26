@@ -82,19 +82,6 @@ const updateUser = async (req, res, next) => {
       user.username = username;
       user.email = email;
     }
-    // const dataBody = Object.keys(body);
-
-    /** const payloadValid = dataBody.map((item) => {
-      let validData = true;
-      if (![name, username, email].includes(item)) {
-        validData = false;
-      }
-      return validData;
-    });* */
-
-    /** if (payloadValid.includes(false)) {
-      throw new ApiError('Payload can only contain username, email or name', 400);
-    }* */
 
     if (user === undefined || user.active === false) {
       finalError.message = 'User not found';
