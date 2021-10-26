@@ -10,26 +10,71 @@ const createUser = async (req, res, next) => {
     if (body.password !== body.passwordConfirmation) {
       throw new ApiError('Passwords do not match', 400);
     }
-
-    const user = await User.create({
+    const userData = {
       username: body.username,
       email: body.email,
       name: body.name,
-      password: body.password,
-    });
+      password: body.password
+    }
+  
+    if (Object.values(userData).some((val) => val === undefined)) {
+      throw new ApiError('Payload must contain name, username, email and password', 400);
+    }
+    const user = await User.create(userData);
 
     res.json(new UserSerializer(user));
   } catch (err) {
     next(err);
   }
 };
+const desactivateUser = async(req, res, next) => {
+  try {
+    const { params } = req;
 
+    const user = await User.findOne({ where: { id: params.id } });
+    if(!user){
+      throw new ApiError('User not found', 400);
+    }
+    res.json(new UserSerializer(user));
+  } catch (err) {
+    next(err);
+  }
+}
+const updateUser = async (req, res, next) => {
+  try {
+    const { body } = req;
+
+    const userData = {
+      username: body.username,
+      email: body.email,
+      name: body.name,
+    }
+    const user = await User.findOne({ where: { id: body.id } });
+    if(!user){
+      throw new ApiError('User not found', 400);
+    }else{
+      if(!user.active){
+        throw new ApiError('User not found', 404);
+      }
+    }
+    const userUpdated = await User.update(user, userData);
+    res.json(new UserSerializer(userUpdated));
+  } catch (err) {
+    next(err);
+  }
+}
 const getUserById = async (req, res, next) => {
   try {
     const { params } = req;
 
     const user = await User.findOne({ where: { id: params.id } });
-
+    if(!user){
+      throw new ApiError('User not found', 400);
+    }else{
+      if(!user.active){
+        throw new ApiError('User not found', 400);
+      }
+    }
     res.json(new UserSerializer(user));
   } catch (err) {
     next(err);
@@ -39,4 +84,6 @@ const getUserById = async (req, res, next) => {
 module.exports = {
   createUser,
   getUserById,
+  updateUser,
+  desactivateUser
 };

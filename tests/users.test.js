@@ -136,7 +136,7 @@ describe('Users routes', () => {
     };
     const response = await request(app).put(`${USERS_PATH}/${USER_ID}`).send(payload);
 
-    expect(response.statusCode).toBe(400);
+    expect(response.statusCode).toBe(404);
     expect(response.body.status).toBe('User not found');
   });
 
