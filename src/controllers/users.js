@@ -54,7 +54,7 @@ const deactivateUser = async (req, res, next) => {
     const { params } = req;
     const user = await User.findOne({ where: { id: params.id } });
     console.log(user);
-    if (!user || user.data === false) {
+    if (!user || user.active === false) {
       throw new ApiError('User not found', 400);
     }
     user.active = false;
