@@ -33,7 +33,7 @@ const getUserById = async (req, res, next) => {
     const { params } = req;
 
     const user = await User.findOne({ where: { id: params.id } });
-    if (!user) {
+    if (!user || !user.active) {
       throw new ApiError('User not found', 400);
     }
     user.active = undefined;
