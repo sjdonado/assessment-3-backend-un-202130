@@ -8,6 +8,9 @@ class UserSerializer extends BaseSerializer {
 
     super('success', serializedModel);
   }
+
+  
+
 }
 
 module.exports = UserSerializer;
