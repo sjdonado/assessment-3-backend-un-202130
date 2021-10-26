@@ -65,7 +65,53 @@ const getUserById = async (req, res, next) => {
   }
 };
 
+const updateUser = async (req, res, next) => {
+  finalError.message = '';
+  finalError.code = '';
+
+  try {
+    const { params } = req;
+    const { body } = req;
+    const { name, username, email } = req.body;
+    const user = await User.findOne({ where: { id: params.id } });
+
+    if (!name || !username || !email) {
+      throw new ApiError('Payload can only contain username, email or name', 400);
+    } else {
+      user.name = name;
+      user.username = username;
+      user.email = email;
+    }
+    // const dataBody = Object.keys(body);
+
+    /** const payloadValid = dataBody.map((item) => {
+      let validData = true;
+      if (![name, username, email].includes(item)) {
+        validData = false;
+      }
+      return validData;
+    });* */
+
+    /** if (payloadValid.includes(false)) {
+      throw new ApiError('Payload can only contain username, email or name', 400);
+    }* */
+
+    if (user === undefined || user.active === false) {
+      finalError.message = 'User not found';
+      finalError.code = 400;
+    }
+
+    ThrowError(finalError.message, finalError.code);
+
+    const newDataUser = await User.update({ where: { id: params.id } }, body);
+    res.json(new UserSerializer(newDataUser));
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   createUser,
   getUserById,
+  updateUser,
 };
