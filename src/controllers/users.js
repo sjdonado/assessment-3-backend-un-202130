@@ -50,7 +50,7 @@ const updateUser = async (req, res, next) => {
       throw new ApiError('Payload can only contain username, email or name', 400);
     }
     if (!user || !user.active) {
-      throw new ApiError('User not found', 404);
+      throw new ApiError('User not found', 400);
     }
     user = await User.update({ where: { id: user.id } }, body);
 
