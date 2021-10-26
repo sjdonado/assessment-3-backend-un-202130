@@ -13,8 +13,9 @@ const createUser = async (req, res, next) => {
       throw new ApiError('Passwords do not match', 400);
     }
 
-    if (body === undefined || body.id === undefined || body.active === false) {
-      throw new ApiError('Payload must contain name, username, email or password', 400);
+    if (body.name === undefined || body.email === undefined
+      || body.password === undefined || body.username === undefined) {
+      throw new ApiError('Payload must contain name, username, email and password', 400);
     }
 
     const user = await User.create({
@@ -37,7 +38,7 @@ const deactivateUser = async (req, res, next) => {
 
     const user = await User.findOne({ where: { id: params.id } });
 
-    if (user === undefined || user.id === undefined || user.active === false) {
+    if (user === undefined || user.active === false) {
       throw new ApiError('User not found', 400);
     }
 
