@@ -44,7 +44,28 @@ const getUserById = async (req, res, next) => {
   }
 };
 
+const updateUser = async (req, res, next) => {
+  try {
+    const { params, body } = req;
+
+    if (!body.username || !body.email || !body.name) {
+      throw new ApiError('Payload can only contain username, email or name', 400);
+    }
+
+    const user = await User.update({ where: { id: params.id, active: true } }, { username: body.username, email: body.email, name: body.name });
+
+    if (!user || !user.active) {
+      throw new ApiError('User not found', 400);
+    }
+
+    res.json(new UserSerializer(user));
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = {
   createUser,
   getUserById,
+  updateUser,
 };
