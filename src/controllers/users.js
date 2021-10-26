@@ -66,7 +66,7 @@ const updateUser = async (req, res, next) => {
       return valid;
     });
 
-    if (!isValid) {
+    if (isValid.includes(false)) {
       throw new ApiError(
         'Payload can only contain username, email or name',
         400,
