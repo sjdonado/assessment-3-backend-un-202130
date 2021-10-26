@@ -77,11 +77,14 @@ const updateUser = async (req, res, next) => {
 const desactivateUser = async (req, res, next) => {
   try {
     const userId = req.params.id;
-
+    const user = await User.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new ApiError('User not found', 400);
+    }
     const updatedUser = await User.update({ where: { id: userId } }, {
       active: false,
     });
-    res.json(new UserSerializer(updatedUser));
+    res.json(new UserSerializer(null));
   } catch (err) {
     next(err);
   }
