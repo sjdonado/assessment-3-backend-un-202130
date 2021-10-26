@@ -16,8 +16,8 @@ const createUser = async (req, res, next) => {
       email: body.email,
       name: body.name,
       password: body.password,
+      active: undefined,
     });
-
     res.json(new UserSerializer(user));
   } catch (err) {
     next(err);
