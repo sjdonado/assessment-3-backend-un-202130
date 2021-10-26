@@ -36,7 +36,7 @@ const desactivateUser = async (req, res, next) => {
     user = await User.update({ where: { id: params.id } }, {
       active: false,
     });
-    res.json({ status: 'success', data: null }).status(200);
+    res.json(new UserSerializer(null));
   } catch (err) {
     next(err);
   }
