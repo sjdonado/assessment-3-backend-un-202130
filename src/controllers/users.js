@@ -10,6 +10,9 @@ const createUser = async (req, res, next) => {
     if (body.password !== body.passwordConfirmation) {
       throw new ApiError('Passwords do not match', 400);
     }
+    if (!Object.keys(body).includes('name', 'username', 'password')) {
+      throw new ApiError('Payload must contain name, username, email and password', 400);
+    }
 
     const user = await User.create({
       username: body.username,
@@ -27,24 +30,17 @@ const createUser = async (req, res, next) => {
 const deleteUser = async (req, res, next) => {
   try {
     const { params } = req;
-    const { body } = req;
     const user = await User.findOne({ where: { id: params.id } });
     if (user === undefined || user.active === false) {
       throw new ApiError('User not found', 400);
     }
-    await User.update(
-      {
-        where: { id: params.id },
-        newValues: {
-          username: body.username,
-          email: body.email,
-          name: body.name,
-          password: body.password,
-          active: body.false,
-        },
-      },
-    );
-    res.json(new UserSerializer(user));
+    const data = {
+      status: 'success',
+      data: null,
+    };
+    user.active = false;
+    User.update({ where: { id: params.id } }, user);
+    res.json(data);
   } catch (err) {
     next(err);
   }
@@ -53,6 +49,20 @@ const updateUser = async (req, res, next) => {
   try {
     const { params } = req;
     const { body } = req;
+    if (!Object.keys(body).includes('name', 'username', 'password')) {
+      throw new ApiError('Payload must contain name, username, email and password', 400);
+    }
+    const Updated = ['name', 'username', 'email'];
+    const Valid = params.map((item) => {
+      let valid = true;
+      if (!Updated.includes(item)) {
+        valid = false;
+      }
+      return valid;
+    });
+    if (Valid.includes(false)) {
+      throw new ApiError('Payload can only contain username, email or name', 400);
+    }
     const user = await User.findOne({ where: { id: params.id } });
     if (user === undefined || user.active === false) {
       throw new ApiError('User not found', 400);
