@@ -10,7 +10,7 @@ const createUser = async (req, res, next) => {
     if (body.password !== body.passwordConfirmation) {
       throw new ApiError('Passwords do not match', 400);
     }
-    if (!Object.keys(body).includes('name', 'username', 'password')) {
+    if (!Object.keys(body).includes('name', 'email', 'username', 'password')) {
       throw new ApiError('Payload must contain name, username, email and password', 400);
     }
 
@@ -19,7 +19,6 @@ const createUser = async (req, res, next) => {
       email: body.email,
       name: body.name,
       password: body.password,
-      active: true,
     });
 
     res.json(new UserSerializer(user));
@@ -49,37 +48,34 @@ const updateUser = async (req, res, next) => {
   try {
     const { params } = req;
     const { body } = req;
-    if (!Object.keys(body).includes('name', 'username', 'password')) {
-      throw new ApiError('Payload must contain name, username, email and password', 400);
-    }
+    const user = await User.findOne({ where: { id: params.id } });
+    const data = Object.keys(body);
     const Updated = ['name', 'username', 'email'];
-    const Valid = params.map((item) => {
-      let valid = true;
+    const valid = data.map((item) => {
+      let valido = true;
       if (!Updated.includes(item)) {
-        valid = false;
+        valido = false;
       }
-      return valid;
+      return valido;
     });
-    if (Valid.includes(false)) {
+    if (valid.includes(false)) {
       throw new ApiError('Payload can only contain username, email or name', 400);
     }
-    const user = await User.findOne({ where: { id: params.id } });
     if (user === undefined || user.active === false) {
       throw new ApiError('User not found', 400);
     }
-    await User.update(
+    const userUpd = await User.update(
       {
         where: { id: params.id },
         newValues: {
-          username: body.username,
-          email: body.email,
-          name: body.name,
-          password: body.password,
-          active: body.active,
+          username: params.username,
+          email: params.email,
+          name: params.name,
+          password: params.password,
         },
       },
     );
-    res.json(new UserSerializer(user));
+    res.json(new UserSerializer(userUpd));
   } catch (err) {
     next(err);
   }
