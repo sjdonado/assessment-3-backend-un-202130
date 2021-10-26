@@ -24,6 +24,27 @@ const createUser = async (req, res, next) => {
   }
 };
 
+const deactivateUser = async (req, res, next) => {
+  try {
+    const { params } = req;
+
+    const user = await User.findOne({ where: { id: params.id } });
+
+    if (user === undefined || user.id === undefined || user.active === false) {
+      throw new ApiError('Error, User not found!', 400);
+    }
+
+    await User.update(
+      { where: { id: params.id } },
+      { active: false },
+    );
+
+    res.json(new UserSerializer(user));
+  } catch (err) {
+    next(err);
+  }
+};
+
 const getUserById = async (req, res, next) => {
   try {
     const { params } = req;
@@ -36,7 +57,30 @@ const getUserById = async (req, res, next) => {
   }
 };
 
+const updateUser = async (req, res, next) => {
+  try {
+    const { params, body } = req;
+
+    let user = await User.findOne({ where: { id: params.id } });
+
+    if (user === undefined || user.id === undefined || user.active === false) {
+      throw new ApiError('Error, User not found!', 400);
+    }
+
+    user = await User.update(
+      { where: { id: params.id } },
+      { username: body.username ? body.username : user.username },
+    );
+
+    res.json(new UserSerializer(user));
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   createUser,
   getUserById,
+  deactivateUser,
+  updateUser,
 };
