@@ -1,5 +1,5 @@
 const ApiError = require('../utils/ApiError');
-
+const UserSerializer = require('../serializers/UserSerializer');
 const User = require('../models/user');
 
 const createUser = async (req, res, next) => {
@@ -22,6 +22,7 @@ const createUser = async (req, res, next) => {
         id: user.id,
         username: user.username,
         name: user.name,
+
         email: user.email,
         createdAt: user.createdAt,
         updatedAt: new Date(),
@@ -34,7 +35,8 @@ const createUser = async (req, res, next) => {
       data: null,
     };
 
-    res.status(user ? 200 : 400).json(response);
+    res.json(new UserSerializer(user));
+    // res.status(user ? 200 : 400).json(response);
   } catch (err) {
     next(err);
   }
@@ -43,7 +45,10 @@ const createUser = async (req, res, next) => {
 const getUserById = async (req, res, next) => {
   try {
     const { params } = req;
-
+    const us = await User.findOne({ where: { id: params.id } });
+    if (us == null || us?.active === false) {
+      throw new ApiError('User not found', 400);
+    }
     const user = await User.findOne({ where: { id: params.id } });
     const response = user ? {
       status: 'success',
@@ -61,7 +66,7 @@ const getUserById = async (req, res, next) => {
       status: 'User not found',
       data: null,
     };
-    res.status(user ? 200 : 400).json(response);
+    res.json(new UserSerializer(user));
   } catch (err) {
     next(err);
   }
@@ -70,11 +75,18 @@ const getUserById = async (req, res, next) => {
 const updateUser = async (req, res, next) => {
   try {
     const { body, params } = req;
+
+    const us = await User.findOne({ where: { id: params.id } });
+    if (us == null || us?.active === false) {
+      throw new ApiError('User not found', 400);
+    }
+
     const user = await User.update({ where: { id: params.id } }, {
       username: body.username,
       name: body.name,
       email: body.email,
     });
+
     const response = user ? {
       status: 'success',
       data: {
@@ -90,8 +102,8 @@ const updateUser = async (req, res, next) => {
       status: 'User not found',
       data: null,
     };
-
-    res.status(user ? 200 : 400).json(response);
+    res.json(new UserSerializer(user));
+    // res.status(user ? 200 : 400).json(response);
   } catch (err) {
     next(err);
   }
@@ -102,12 +114,13 @@ const deactivateUser = async (req, res, next) => {
     const { body, params } = req;
     const user = await User.update({ where: { id: params.id } }, {
       active: false,
+
     });
-    const response = {
-      status: user ? 'success' : 'User not found',
-      data: null,
-    };
-    res.status(user ? 200 : 400).json(response);
+    if (user == null) {
+      throw new ApiError('User not found', 400);
+    }
+
+    res.json(new UserSerializer(null));
   } catch (err) {
     next(err);
   }

@@ -38,7 +38,7 @@ const find = ({ where }, kind) => new Promise((resolve, reject) => {
     let match = true;
     filters.forEach((filter) => {
       // eslint-disable-next-line eqeqeq
-      if (obj[filter] != where[filter] || obj.active == false) {
+      if (obj[filter] != where[filter]) {
         match = false;
       }
     });
