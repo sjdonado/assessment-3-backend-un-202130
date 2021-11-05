@@ -1,7 +1,6 @@
 const ApiError = require('../utils/ApiError');
 const User = require('../models/user');
 const UserSerializer = require('../serializers/UserSerializer');
-
 const createUser = async (req, res, next) => {
   try {
     const { body } = req;
@@ -42,7 +41,6 @@ const deleteUser = async (req, res, next) => {
   try {
     const { params } = req;
     const user = await User.update({ where: { id: params.id } }, { active: false });
-    console.log(user);
     if (user === null) {
       throw new ApiError('User not found', 400);
     }
@@ -62,8 +60,6 @@ const updateUser = async (req, res, next) => {
     const { body } = req;
     const user = await User.findOne({ where: { id: params.id } });
     
-    console.log(user);
-    
     if (!user || user.active === false) {
       throw new ApiError('User not found', 400);
     }
@@ -72,7 +68,6 @@ const updateUser = async (req, res, next) => {
       && body.name === undefined) || body.password !== undefined) {
       throw new ApiError('Payload can only contain username, email or name', 400);
     }
-    
     const updatedUser = await User.update({ where: { id: params.id } }, body);
     res.json(new UserSerializer(updatedUser));
   } catch (error) {
