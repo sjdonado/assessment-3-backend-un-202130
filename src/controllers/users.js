@@ -44,6 +44,11 @@ const getUserById = async (req, res, next) => {
     const { params } = req;
 
     const user = await User.findOne({ where: { id: params.id } });
+    
+   if (user === undefined || user.active === false) 
+   {
+      throw new ApiError('User not found', 400);
+   }
 
     res.json(new UserSerializer(user));
   } catch (err) {
