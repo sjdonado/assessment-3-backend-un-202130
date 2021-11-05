@@ -7,6 +7,21 @@ const createUser = async (req, res, next) => {
   try {
     const { body } = req;
 
+    if (body.name === undefined) 
+    {
+        throw new ApiError('Payload must contain name, username, email and password', 400);
+    }
+    
+    if (body.username === undefined) 
+    {
+        throw new ApiError('Payload must contain name, username, email and password', 400);
+    }
+    
+    if (body.email === undefined) 
+    {
+        throw new ApiError('Payload must contain name, username, email and password', 400);
+    }
+    
     if (body.password !== body.passwordConfirmation) {
       throw new ApiError('Passwords do not match', 400);
     }
